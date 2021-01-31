@@ -90,7 +90,7 @@ export const Login:FunctionComponent = ()=> {
           <ButtonLink 
             isDark={isDark}
             text={LoginPageText.FORGET_PASSWORD}
-            onClick={()=>console.log('signup')}
+            onClick={()=>navigator.navigate('forgetPassword')}
           />
 
           <PrimaryButton
