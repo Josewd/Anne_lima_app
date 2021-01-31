@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { UserStackNavigation } from './router';
 import { UserProvider } from '../Global/UserProvider'
 import { Login } from './login';
+import { ForgetPassword } from './ForgetPassword'
 import { NavigationContainer } from '@react-navigation/native';
 
 const StartStack = createStackNavigator<UserStackNavigation>()
@@ -16,6 +17,7 @@ export const MainNavigation: FunctionComponent = ()=> {
       {/* <StartStack.Screen name="splash" component={} />
           <StartStack.Screen name="signUp" component={} /> */}
           <StartStack.Screen name="login" component={Login} />
+          <StartStack.Screen name="forgetPassword" component={ForgetPassword} />
         </StartStack.Navigator>
       </UserProvider>
     </NavigationContainer>
