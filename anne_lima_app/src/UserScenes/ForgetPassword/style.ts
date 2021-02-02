@@ -6,6 +6,10 @@ type loginStyle = {
     subTitle: ViewStyle;
     labelError:ViewStyle;
     appbar: ViewStyle;
+    dialogContainer: ViewStyle;
+    dialogTitle: ViewStyle;
+    dialogSubTitle: ViewStyle;
+    dialogButton: ViewStyle;
 }
 
 export const style : StyleSheet.NamedStyles<loginStyle> = {
@@ -22,10 +26,25 @@ export const style : StyleSheet.NamedStyles<loginStyle> = {
       opacity: 0.89
     },
     title:{
-      marginTop: -120,
+      marginTop: 200,
       fontWeight:'bold',
       fontSize: 35,
       color: '#000'
+    },
+    dialogTitle:{
+      fontWeight:'bold',
+      fontSize: 35,
+      color: '#000',
+      textAlign:'center'
+    },
+    dialogSubTitle:{
+      marginBottom: 20,
+      color: 'grey',
+      fontSize: 18,
+      textAlign: 'center'
+    },
+    dialogButton:{
+      marginTop: -100,
     },
     labelError: {
       color: '#f00',
@@ -38,7 +57,15 @@ export const style : StyleSheet.NamedStyles<loginStyle> = {
       color: 'grey',
       fontSize: 18,
       textAlign: 'center'
-    }
+    },
+    dialogContainer: {
+    height: 320,
+    width: '90%',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    alignSelf: 'center',
+    backgroundColor: 'white',
+  },
   }
 
   export const darkStyle : StyleSheet.NamedStyles<loginStyle> = {
@@ -56,10 +83,26 @@ export const style : StyleSheet.NamedStyles<loginStyle> = {
       opacity: 0.89
     },
     title:{
-      marginTop: -120,
+      marginTop: 200,
       fontWeight:'bold',
       fontSize: 35,
       color: '#fff'
+    },
+    dialogTitle:{
+      fontWeight:'bold',
+      fontSize: 35,
+      color: '#fff',
+      textAlign: 'center',
+      marginBottom: 20,
+    },
+    dialogSubTitle:{
+      marginBottom: 10,
+      color: 'grey',
+      fontSize: 18,
+      textAlign: 'center'
+    },
+    dialogButton:{
+      marginTop: -100,
     },
     labelError: {
       color: '#f00',
@@ -69,6 +112,16 @@ export const style : StyleSheet.NamedStyles<loginStyle> = {
       color: 'grey',
       fontSize: 18,
       textAlign: 'center'
-    }
+    },
+    dialogContainer: {
+      height: 320,
+      width: '90%',
+      justifyContent: 'space-evenly',
+      alignItems: 'center',
+      alignSelf: 'center',
+      backgroundColor: '#0e0835',
+      borderRadius: 20,
+      opacity: 1
+    },
   }
   
