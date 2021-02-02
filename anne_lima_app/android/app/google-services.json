@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "397465244973",
+    "project_id": "anne-lima",
+    "storage_bucket": "anne-lima.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:397465244973:android:d09063f7bfe574e4caafa4",
+        "android_client_info": {
+          "package_name": "com.anne_lima_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "397465244973-5m2utbkeuo0hj4hmpskag7csehk639i5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHsuc2CQd2w-zvPTiQAJc2tvoFe-piO48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "397465244973-5m2utbkeuo0hj4hmpskag7csehk639i5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
