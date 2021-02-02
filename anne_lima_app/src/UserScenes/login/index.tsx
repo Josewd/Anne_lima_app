@@ -9,7 +9,8 @@ import { InputDefault } from '../components/InputDefault';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ButtonLink } from '../components/ButtonLink';
 import { anne_api } from '../../services/anne_api';
-import { Appbar, HelperText } from 'react-native-paper'
+import { HelperText } from 'react-native-paper'
+import { storeData } from '../../constant';
 
 export type user = {
   id: string;
@@ -22,7 +23,7 @@ export type user = {
 export const Login:FunctionComponent = ()=> {
     const [showPassword, setShowPassword] = useState(true)
     const [showHelper, setShowHelper] = useState(false)
-    const { setUserState, isDark, setIsDark } = useContext(UserInfoContext)
+    const { isDark, setIsDark } = useContext(UserInfoContext)
     const navigator = useNavigation<LoginNavigationProp>()
     const [form, setForm] = useState({email: '', password: ''})
 
@@ -31,15 +32,9 @@ export const Login:FunctionComponent = ()=> {
     const loginHandle = ()=>{
       anne_api.post('/user/login', form)
       .then(res=>{
-        console.log(res.data.user)
         const dataUser: user = res.data.user
-        setUserState({
-          id: dataUser.id,
-          name: dataUser.name,
-          email: dataUser.email,
-          phone: dataUser.phone_number,
-          birthday: dataUser.birthday
-        })
+        storeData('user', dataUser)
+        storeData('token', res.data.token)
         setShowHelper(false)
       }).catch(err=>{
         console.log(err.message)
@@ -101,7 +96,7 @@ export const Login:FunctionComponent = ()=> {
            isDark={isDark}
             text='Don`t have an account yet? '
             boldText='Sign Up'
-            onClick={()=>console.log('signup')}
+            onClick={()=>navigator.navigate('signUp')}
           />
       </View>
   </View>
