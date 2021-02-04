@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
-import { View, Text, ImageBackground, StatusBar , Switch, Alert} from 'react-native'
+import { View, Text, StatusBar , Alert} from 'react-native'
 import { SignUpNavigationProp } from './types'
 import { useNavigation } from '@react-navigation/native'
 import { UserInfoContext } from '../../contexts/UserContext';
 import { SignUpPageText } from './text';
-import { darkStyle, style } from './style'
+import {  style } from './style'
 import { InputDefault } from '../components/InputDefault';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ButtonLink } from '../components/ButtonLink';
@@ -12,20 +12,13 @@ import { anne_api } from '../../services/anne_api';
 import { HelperText } from 'react-native-paper'
 import { PhoneInput } from '../components/PhoneMasketInput';
 import { DateInput } from '../components/DateMaskedInput';
-import { storeData, validateEmail } from '../../constant';
-
-export type user = {
-  id: string;
-  name: string;
-  email: string;
-  phone_number: string;
-  birthday: string;
-}
+import { storeTokenData, storeUserData, validateEmail } from '../../constant';
+import { UserInterface } from '../../Global/UserProvider'
 
 export const SignUp:FunctionComponent = ()=> {
     const [showPassword, setShowPassword] = useState(true)
     const [showHelper, setShowHelper] = useState(false)
-    const { setUserState, isDark, setIsDark } = useContext(UserInfoContext)
+    const { setUserState} = useContext(UserInfoContext)
     const navigator = useNavigation<SignUpNavigationProp>()
     const [form, setForm] = useState({name: '',
                                       email: '', 
@@ -40,9 +33,18 @@ export const SignUp:FunctionComponent = ()=> {
         if(validateEmail(form.email)){
             anne_api.post('/user', form)
             .then(res=>{
-              const dataUser: user = res.data.user
-              storeData('token', res.data.token)
-              storeData('user', dataUser)
+              const user: UserInterface = res.data.user
+              storeUserData(user)
+              storeTokenData(res.data.token)
+              setUserState({
+                id: user.id,
+                name: user.name,
+                birthday: user.birthday,
+                email: user.email,
+                phone_number: user.phone_number,
+                role: user.role,
+                avatar: user.avatar
+            })
               setShowHelper(false)
             }).catch(err=>{
               console.log(err.message)
@@ -57,8 +59,8 @@ export const SignUp:FunctionComponent = ()=> {
     <View>
     <StatusBar translucent backgroundColor='transparent'/>
 
-    <View style={isDark? darkStyle.containerAbsolute :style.containerAbsolute}>
-        <Text style={isDark? darkStyle.title :style.title}>{SignUpPageText.TITLE}</Text>
+    <View style={style.containerAbsolute}>
+        <Text style={style.title}>{SignUpPageText.TITLE}</Text>
         <Text style={style.subTitle}>Create your account</Text>
         
         <InputDefault
