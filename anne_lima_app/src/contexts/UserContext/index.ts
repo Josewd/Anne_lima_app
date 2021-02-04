@@ -3,8 +3,6 @@ import { UserInterface } from '../../Global/UserProvider';
 
 type contextProps = {
     userState : UserInterface;
-    isDark: boolean
-    setIsDark: (isDark:boolean)=>void
     setUserState: React.Dispatch<React.SetStateAction<UserInterface>>
 }
 

@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
-import { View, Text, ImageBackground, StatusBar , Switch} from 'react-native'
+import { View, Text, ImageBackground, StatusBar} from 'react-native'
 import { LoginNavigationProp } from './types'
 import { useNavigation } from '@react-navigation/native'
 import { UserInfoContext } from '../../contexts/UserContext';
@@ -10,20 +10,14 @@ import { PrimaryButton } from '../components/PrimaryButton';
 import { ButtonLink } from '../components/ButtonLink';
 import { anne_api } from '../../services/anne_api';
 import { HelperText } from 'react-native-paper'
-import { storeData } from '../../constant';
+import { storeTokenData, storeUserData } from '../../constant';
+import { UserInterface } from '../../Global/UserProvider';
 
-export type user = {
-  id: string;
-  name: string;
-  email: string;
-  phone_number: string;
-  birthday: string;
-}
 
 export const Login:FunctionComponent = ()=> {
     const [showPassword, setShowPassword] = useState(true)
     const [showHelper, setShowHelper] = useState(false)
-    const { isDark, setIsDark } = useContext(UserInfoContext)
+    const { setUserState } = useContext(UserInfoContext)
     const navigator = useNavigation<LoginNavigationProp>()
     const [form, setForm] = useState({email: '', password: ''})
 
@@ -32,9 +26,20 @@ export const Login:FunctionComponent = ()=> {
     const loginHandle = ()=>{
       anne_api.post('/user/login', form)
       .then(res=>{
-        const dataUser: user = res.data.user
-        storeData('user', dataUser)
-        storeData('token', res.data.token)
+        const user: UserInterface = res.data.user
+        storeUserData(user)
+        storeTokenData(res.data.token)
+        setUserState({
+          id: user.id,
+          name: user.name,
+          birthday: user.birthday,
+          email: user.email,
+          phone_number: user.phone_number,
+          role: user.role,
+          avatar: user.avatar
+      })
+      console.log(res.data)
+      navigator.navigate('mainPage')
         setShowHelper(false)
       }).catch(err=>{
         console.log(err.message)
@@ -50,14 +55,8 @@ export const Login:FunctionComponent = ()=> {
       source={require('../../assets/img/manicure2.jpg')}
     />
 
-    <Switch 
-      value={isDark} 
-      onValueChange={()=> setIsDark(!isDark)} 
-      style={{position: 'absolute', top: 50, right: 20}}
-      />
-
-    <View style={isDark? darkStyle.containerAbsolute :style.containerAbsolute}>
-        <Text style={isDark? darkStyle.title :style.title}>{LoginPageText.TITLE}</Text>
+    <View style={style.containerAbsolute}>
+        <Text style={style.title}>{LoginPageText.TITLE}</Text>
         <Text style={style.subTitle}>Login to your account</Text>
           <InputDefault
             secureTextEntry={false}
@@ -83,7 +82,6 @@ export const Login:FunctionComponent = ()=> {
             </HelperText>
 
           <ButtonLink 
-            isDark={isDark}
             text={LoginPageText.FORGET_PASSWORD}
             onClick={()=>navigator.navigate('forgetPassword')}
           />
@@ -93,7 +91,6 @@ export const Login:FunctionComponent = ()=> {
             onClick={loginHandle}
           />
           <ButtonLink 
-           isDark={isDark}
             text='Don`t have an account yet? '
             boldText='Sign Up'
             onClick={()=>navigator.navigate('signUp')}

@@ -3,4 +3,5 @@ export type UserStackNavigation = {
     signUp: undefined;
     splash: undefined;
     forgetPassword: undefined;
+    mainPage: undefined;
 }
