@@ -9,7 +9,6 @@ type AppBarProps = {
 }
 
 export const Appbar:FunctionComponent<AppBarProps> = (props)=> {
-console.log(props)
   return (
     <SafeAreaView style={ style.appBar}>
         <TouchableOpacity onPress={props.onClick} style={{marginHorizontal: 10, justifyContent:'flex-end'}}>

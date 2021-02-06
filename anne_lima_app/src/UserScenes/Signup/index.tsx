@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
-import { View, Text, StatusBar , Alert} from 'react-native'
+import { View, Text, StatusBar , Alert, Image, ActivityIndicator} from 'react-native'
 import { SignUpNavigationProp } from './types'
 import { useNavigation } from '@react-navigation/native'
 import { UserInfoContext } from '../../contexts/UserContext';
@@ -28,28 +28,32 @@ export const SignUp:FunctionComponent = ()=> {
                                       role: 'normal'
                                     })
     const [confirmPassword, setConfirmPassword] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const SignUpHandle = async()=>{
         if(validateEmail(form.email)){
             anne_api.post('/user', form)
             .then(res=>{
               const user: UserInterface = res.data.user
-              storeUserData(user)
-              storeTokenData(res.data.token)
-              setUserState({
-                id: user.id,
-                name: user.name,
-                birthday: user.birthday,
-                email: user.email,
-                phone_number: user.phone_number,
-                role: user.role,
-                avatar: user.avatar
-            })
-              setShowHelper(false)
-            }).catch(err=>{
-              console.log(err.message)
-              setShowHelper(true)
-            })
+        storeUserData(user)
+        storeTokenData(res.data.token)
+        setUserState({
+          id: user.id,
+          name: user.name,
+          birthday: user.birthday,
+          email: user.email,
+          phone_number: user.phone_number,
+          role: user.role,
+          avatar: user.avatar
+      })
+      console.log(res.data)
+      navigator.navigate('mainPage')
+        setShowHelper(false)
+      }).catch(err=>{
+        console.log(err.message)
+        setShowHelper(true)
+        setLoading(false)
+      })
         }else{
             Alert.alert('invalid email')
         }
@@ -60,7 +64,10 @@ export const SignUp:FunctionComponent = ()=> {
     <StatusBar translucent backgroundColor='transparent'/>
 
     <View style={style.containerAbsolute}>
+      <View style={{alignItems: 'center'}}>
+        <Image style={{width: 90, height:40, marginBottom: -30}}source={require('../../assets/img/brushLogo.png')}/>
         <Text style={style.title}>{SignUpPageText.TITLE}</Text>
+      </View>
         <Text style={style.subTitle}>Create your account</Text>
         
         <InputDefault
@@ -122,12 +129,11 @@ export const SignUp:FunctionComponent = ()=> {
               {SignUpPageText.ERROR_MESSAGE}
             </HelperText>
 
-          <PrimaryButton
+            {loading? <ActivityIndicator size="large" color='#eb42b8'/> :<PrimaryButton
             text='Sign Up'
             onClick={SignUpHandle}
-          />
+          />}
           <ButtonLink 
-           isDark={isDark}
             text='Already have an account? '
             boldText='Log in'
             onClick={()=>navigator.navigate('login')}

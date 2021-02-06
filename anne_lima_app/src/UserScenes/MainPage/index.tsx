@@ -12,6 +12,7 @@ import { anne_api } from '../../services/anne_api';
 import { AvatarHolder } from '../components/AvatarImage';
 import { AvatarText } from '../components/AvatarText';
 import { BottomBar } from '../components/BottomBarIcons';
+import { style } from './style'
 
 export const MainPage: FunctionComponent = ()=> {
     const navigator = useNavigation<MainPageNavigationProp>()
@@ -23,6 +24,7 @@ export const MainPage: FunctionComponent = ()=> {
    
     const { userState } = useContext(UserInfoContext)
     const [professionals, setProf] = useState([])
+    const [services, setServices] = useState([])
     useEffect(()=>{
         anne_api.get('/professional',{ headers:{
             authorization: token
@@ -37,6 +39,16 @@ export const MainPage: FunctionComponent = ()=> {
                }
             })
             setProf(elements)
+        })
+        anne_api.get('/service', { headers:{
+            authorization: token
+        }} ).then(res=>{
+            const elements = res.data.result.map((e: any)=>{
+                return <Text>{e.title}</Text>
+               
+             })
+             setServices(elements)
+            
         })
     },[token])
 
@@ -67,44 +79,12 @@ export const MainPage: FunctionComponent = ()=> {
             <ScrollHorizontal title='Our Specialists:'>
                 {professionals}
             </ScrollHorizontal>
+            <ScrollHorizontal title='Our Services:'>
+                {services}
+            </ScrollHorizontal>
         </View>
-        <BottomBar></BottomBar>
+        <BottomBar/>
     </View>
   );
 }
 
-const style = StyleSheet.create({
-    backgroundDark:{
-        backgroundColor: '#030013',
-        opacity: 0.89,
-        flexGrow: 1
-    },
-    background: {
-        flexGrow:1
-    },
-    containerTop:{
-        height: 320, 
-        alignItems:'center', 
-    },
-    serchBar: {
-        width:'80%', 
-        marginBottom: 95, 
-        marginRight:5, 
-        height:40, 
-        opacity: 0.8,
-        borderRadius:15,
-        alignItems: 'center'
-    },
-    title: {
-        fontWeight: 'bold', 
-        color: '#fff', 
-        fontSize: 18,
-        marginBottom: 10 
-    },
-    bkImage:{
-        width: '100%', 
-        height: '100%' ,
-        alignItems:'center', 
-        justifyContent:'flex-end'
-    }
-})

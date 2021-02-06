@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
-import { View, Text, ImageBackground, StatusBar} from 'react-native'
+import { View, Text, ImageBackground, StatusBar, Image, ActivityIndicator} from 'react-native'
 import { LoginNavigationProp } from './types'
 import { useNavigation } from '@react-navigation/native'
 import { UserInfoContext } from '../../contexts/UserContext';
 import { LoginPageText } from './text';
-import { darkStyle, style } from './style'
+import { style } from './style'
 import { InputDefault } from '../components/InputDefault';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ButtonLink } from '../components/ButtonLink';
@@ -13,6 +13,7 @@ import { HelperText } from 'react-native-paper'
 import { storeTokenData, storeUserData } from '../../constant';
 import { UserInterface } from '../../Global/UserProvider';
 
+ 
 
 export const Login:FunctionComponent = ()=> {
     const [showPassword, setShowPassword] = useState(true)
@@ -20,10 +21,12 @@ export const Login:FunctionComponent = ()=> {
     const { setUserState } = useContext(UserInfoContext)
     const navigator = useNavigation<LoginNavigationProp>()
     const [form, setForm] = useState({email: '', password: ''})
+    const [loading, setLoading] = useState(false)
 
 
 
     const loginHandle = ()=>{
+      setLoading(!loading)
       anne_api.post('/user/login', form)
       .then(res=>{
         const user: UserInterface = res.data.user
@@ -44,6 +47,7 @@ export const Login:FunctionComponent = ()=> {
       }).catch(err=>{
         console.log(err.message)
         setShowHelper(true)
+        setLoading(false)
       })
     }
 
@@ -53,11 +57,19 @@ export const Login:FunctionComponent = ()=> {
     <ImageBackground 
       style={style.backgroundImage} 
       source={require('../../assets/img/manicure2.jpg')}
-    />
+    >
+    </ImageBackground>
 
     <View style={style.containerAbsolute}>
         <Text style={style.title}>{LoginPageText.TITLE}</Text>
         <Text style={style.subTitle}>Login to your account</Text>
+        <View style={style.logoContainer}>
+          <Text style={style.logoTitle}>ANNE LIMA nail design</Text>
+          <Image 
+            style={{width: 90, height:40, marginTop: -20}}
+            source={require('../../assets/img/brushLogo.png')}
+          />
+        </View>
           <InputDefault
             secureTextEntry={false}
             icon='email'
@@ -86,10 +98,10 @@ export const Login:FunctionComponent = ()=> {
             onClick={()=>navigator.navigate('forgetPassword')}
           />
 
-          <PrimaryButton
+          {loading? <ActivityIndicator size="large" color='#eb42b8'/> :<PrimaryButton
             text='Login'
             onClick={loginHandle}
-          />
+          />}
           <ButtonLink 
             text='Don`t have an account yet? '
             boldText='Sign Up'

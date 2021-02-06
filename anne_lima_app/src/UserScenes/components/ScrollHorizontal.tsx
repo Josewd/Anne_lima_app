@@ -24,12 +24,12 @@ export const ScrollHorizontal:FunctionComponent<ScrollProps> = (props)=> {
 const style = StyleSheet.create({
     container: {
         width: '100%',
-        marginTop: -40
+        marginTop: -40,
+        marginBottom: 60
     },
     scroll: {
         flexDirection: 'row',
         width: '100%',
-        height: 90,
         paddingHorizontal: 10,
         backgroundColor: 'transparent'
     },
