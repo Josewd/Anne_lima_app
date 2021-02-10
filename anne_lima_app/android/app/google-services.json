@@ -1,33 +1,34 @@
 {
   "project_info": {
-    "project_number": "397465244973",
-    "project_id": "anne-lima",
-    "storage_bucket": "anne-lima.appspot.com"
+    "project_number": "756349738558",
+    "firebase_url": "https://anne-lima-app-default-rtdb.firebaseio.com",
+    "project_id": "anne-lima-app",
+    "storage_bucket": "anne-lima-app.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:397465244973:android:d09063f7bfe574e4caafa4",
+        "mobilesdk_app_id": "1:756349738558:android:8893af016c3c33f3fffb6f",
         "android_client_info": {
           "package_name": "com.anne_lima_app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "397465244973-5m2utbkeuo0hj4hmpskag7csehk639i5.apps.googleusercontent.com",
+          "client_id": "756349738558-fmg7bfg7cre1887s0k54eub7q25gs104.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBHsuc2CQd2w-zvPTiQAJc2tvoFe-piO48"
+          "current_key": "AIzaSyDpN1yN-rh3YnKOiqD3GlQCN_CbXsMjGdo"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "397465244973-5m2utbkeuo0hj4hmpskag7csehk639i5.apps.googleusercontent.com",
+              "client_id": "756349738558-fmg7bfg7cre1887s0k54eub7q25gs104.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

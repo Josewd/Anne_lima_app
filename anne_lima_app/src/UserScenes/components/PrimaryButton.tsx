@@ -26,7 +26,7 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent:'center',
-    marginTop: 30
+    marginTop: 10
    },
    text:{
     fontSize: 20,

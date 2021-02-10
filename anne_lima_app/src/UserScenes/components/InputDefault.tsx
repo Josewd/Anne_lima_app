@@ -43,7 +43,7 @@ const style = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent:'space-between',
-      margin: 5
+      margin: 3
     },
     iconContainer:{
         width: 50,
@@ -61,7 +61,9 @@ const style = StyleSheet.create({
         borderRadius: 30
     },
     input: {
-      flexGrow: 1
+      flexGrow: 1,
+      textAlign: 'right',
+      paddingRight: 30
     }
   })
   

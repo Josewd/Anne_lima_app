@@ -1,27 +1,21 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Text, View, StatusBar, Image, ImageBackground} from 'react-native';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { PhoneInput } from '../components/PhoneMasketInput';
-import { style } from './style'
+import { style } from './styles'
 import { ButtonLink } from '../components/ButtonLink';
 import { PrimaryButton } from '../components/PrimaryButton';
-import { LoginNavigationProp } from './types'
+import { VerifyPhoneNavigationProp } from './types'
 import { useNavigation } from '@react-navigation/native';
 import { InputDefault } from '../components/InputDefault';
-import { UserInfoContext } from '../../contexts/UserContext';
 
-const Login:FunctionComponent = ()=>{
-    const navigator = useNavigation<LoginNavigationProp>()
-
+const VerifyPhone:FunctionComponent = ()=>{
+    const navigator = useNavigation<VerifyPhoneNavigationProp>()
     const [confirm, setConfirm] = useState({} as FirebaseAuthTypes.ConfirmationResult);
     const [code, setCode] = useState('');
     const [phoneNumber, setphoneNumber] = useState('')
-    const { user } = useContext(UserInfoContext)
-    if(user){
-      navigator.navigate('mainPage')
-    }
+    const user = auth().currentUser
     async function verifyPhoneNumber() {
-      auth().signOut()
         const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
         console.log(confirmation)
         setConfirm(confirmation);
@@ -29,11 +23,7 @@ const Login:FunctionComponent = ()=>{
       async function confirmCode() {
         try {
           confirm.confirm(code)
-          if(user.email){
-            navigator.navigate('mainPage')
-          }else{
-            navigator.navigate('signUp')
-          }
+          navigator.navigate('signUp')
         } catch (error) {
           console.log('Invalid code.');
         }
@@ -55,9 +45,9 @@ const Login:FunctionComponent = ()=>{
                       style={style.logo}
                       source={require('../../assets/img/brushLogo.png')}
                     />
-                    <Text style={style.title}>Login</Text>
+                    <Text style={style.title}>Phone Number</Text>
                   </View>
-                    <Text style={style.subTitle}>Log with your phone number</Text>
+                    <Text style={style.subTitle}>We will send a verification code by SMS</Text>
                 <PhoneInput
                 placeholder='+353 12 123 1234'
                 icon='phone'
@@ -65,15 +55,14 @@ const Login:FunctionComponent = ()=>{
                 onChangeText={(text:string)=>{
                     setphoneNumber(text)
                 }}/>
-              
                 <PrimaryButton
-                  text="Log in"
+                  text="Send Code"
                   onClick={verifyPhoneNumber}
                 />
                 <ButtonLink 
                   text='Already have an account? '
-                  boldText='Sign Up'
-                  onClick={()=>navigator.navigate('verifyPhone')}
+                  boldText='Log in'
+                  onClick={()=>navigator.navigate('login')}
                 />
                </View>
             </View>
@@ -91,12 +80,12 @@ const Login:FunctionComponent = ()=>{
                 <View style={style.containerAbsolute}>
                   <View style={{alignItems: 'center'}}>
                     <Image 
-                      style={{width: 90, height:40, marginBottom: -30}}
+                      style={style.logo}
                       source={require('../../assets/img/brushLogo.png')}
                     />
-                    <Text style={style.title}>Confirm Code</Text>
+                    <Text style={style.title}>Verify Phone Number</Text>
                   </View>
-                    <Text style={style.subTitle}>Type de verification code</Text>
+                    <Text style={style.subTitle}>digit your phone number</Text>
                     <InputDefault 
                         secureTextEntry={false} 
                         icon='lock' 
@@ -113,46 +102,9 @@ const Login:FunctionComponent = ()=>{
              
             );
           } else{
-
-            return (
-              <View>
-                <StatusBar translucent backgroundColor='transparent'/>
-                <ImageBackground
-                  style={style.backgroundImage} 
-                  source={require('../../assets/img/manicure2.jpg')}
-                >
-                </ImageBackground>
-                <View style={style.containerAbsolute}>
-                  <View style={{alignItems: 'center'}}>
-                    <Image 
-                      style={style.logo}
-                      source={require('../../assets/img/brushLogo.png')}
-                    />
-                    <Text style={style.title}>Login</Text>
-                  </View>
-                    <Text style={style.subTitle}>Type your phone number</Text>
-                <PhoneInput
-                placeholder='+353 12 123 1234'
-                icon='phone'
-                value={phoneNumber}
-                onChangeText={(text:string)=>{
-                    setphoneNumber(text)
-                }}/>
-                <PrimaryButton
-                  text="Verify Phone Number"
-                  onClick={verifyPhoneNumber}
-                />
-                <ButtonLink 
-                  text='Already have an account? '
-                  boldText='Sign Up'
-                  onClick={()=>navigator.navigate('verifyPhone')}
-                />
-               </View>
-            </View>
-            )
-              
+              return <View></View>
           }
 }
 
-export default Login
+export default  VerifyPhone
 
