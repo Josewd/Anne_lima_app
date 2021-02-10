@@ -1,66 +1,33 @@
-import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
+import React, { FunctionComponent, useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
-import { useAuthentication } from '../../hooks/useAuthentication';
 import { MainPageNavigationProp } from './types';
-import { UserInfoContext } from '../../contexts/UserContext';
-import { getTokenData } from '../../constant';
-import { ImageBackground, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { ImageBackground, StatusBar,  Text, View } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { Appbar } from '../components/Appbar';
 import { ScrollHorizontal } from '../components/ScrollHorizontal';
-import { anne_api } from '../../services/anne_api';
-import { AvatarHolder } from '../components/AvatarImage';
-import { AvatarText } from '../components/AvatarText';
 import { BottomBar } from '../components/BottomBarIcons';
 import { style } from './style'
+import { UserInfoContext } from '../../contexts/UserContext';
+import auth from '@react-native-firebase/auth'
 
 export const MainPage: FunctionComponent = ()=> {
+    const {user} = useContext(UserInfoContext) 
     const navigator = useNavigation<MainPageNavigationProp>()
-    if(!useAuthentication()){
+    if(!user){
         navigator.navigate('login')
     }
-    getTokenData().then(tkn=> setToken(tkn as string))
-    const [token, setToken] = useState('')
-   
-    const { userState } = useContext(UserInfoContext)
     const [professionals, setProf] = useState([])
     const [services, setServices] = useState([])
-    useEffect(()=>{
-        anne_api.get('/professional',{ headers:{
-            authorization: token
-        }}).then(res=>{
-           const elements = res.data.map((e: any)=>{
-               const image = {uri: e.avatar}
-               const text = `${e.name[0].toUpperCase()}`
-               if(image.uri){
-                   return <AvatarHolder key={e.id} name={e.name} image={image}/>
-               }else{
-                   return <AvatarText key={e.id} name={e.name} text={text}/>
-               }
-            })
-            setProf(elements)
-        })
-        anne_api.get('/service', { headers:{
-            authorization: token
-        }} ).then(res=>{
-            const elements = res.data.result.map((e: any)=>{
-                return <Text>{e.title}</Text>
-               
-             })
-             setServices(elements)
-            
-        })
-    },[token])
-
+  
    const [searchQuery, setSearchQuery] = React.useState('');
-   const image = {uri: userState!.avatar}
+   const image = {uri: user?.photoURL}
    const onChangeSearch = (query:string) => setSearchQuery(query);
   return (
     <View style={style.background}>
         <Appbar
-        //onClick={}
+        onClick={()=> navigator.navigate('userProfile')}
         image={image}
-        text={`Welcome, ${userState?.name} !`}
+        text={`Welcome, ${user?.displayName} !`}
          />
       <StatusBar translucent backgroundColor='transparent'/>
         <View style={style.containerTop}>

@@ -19,7 +19,7 @@ export const ButtonLink: FunctionComponent<inputProps> = (props)=> {
 
 const style = StyleSheet.create({
    button:{
-    marginTop: 5,
+    marginTop: 70,
     width: '75%',
     borderRadius: 30,
     flexDirection: 'row',

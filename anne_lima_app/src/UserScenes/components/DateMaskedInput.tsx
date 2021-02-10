@@ -60,6 +60,8 @@ const style = StyleSheet.create({
         borderRadius: 30
     },
     input: {
-      flexGrow: 1
+      flexGrow: 1,
+      textAlign: 'right',
+      paddingRight: 30
     }
   })

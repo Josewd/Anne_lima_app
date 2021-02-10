@@ -1,9 +1,9 @@
+import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { createContext }from 'react';
-import { UserInterface } from '../../Global/UserProvider';
 
 type contextProps = {
-    userState : UserInterface;
-    setUserState: React.Dispatch<React.SetStateAction<UserInterface>>
+    user: any
+    setUser: React.Dispatch<React.SetStateAction<FirebaseAuthTypes.User | null>>
 }
 
 export const UserInfoContext = createContext<Partial<contextProps>>({});

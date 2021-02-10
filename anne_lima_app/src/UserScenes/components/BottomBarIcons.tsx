@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import  Icon  from 'react-native-vector-icons/FontAwesome';
@@ -11,17 +11,24 @@ type AppBarProps = {
 }
 
 export const BottomBar:FunctionComponent<AppBarProps> = (props)=> {
+    const [buttons, setButtons] = useState({home: 'grey', calendar: 'grey', history: 'grey' })
 
   return (
     <View style={ style.appBar}>
         <TouchableOpacity onPress={props.homeChange}>
-           <Icon name='home' size={30} color='#eb42b8'/>
+           <Icon name='home' size={30} color={buttons.home} onPress={()=>{
+               setButtons({home: '#eb42b8', calendar: 'grey' , history: 'grey'})
+            }}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={props.appointmentChange}>
-           <Icon name='calendar-check-o' size={30} color='#eb42b8'/>
+           <Icon name='calendar-check-o' size={30} color={buttons.calendar}onPress={()=>{
+               setButtons({home: 'grey', calendar: '#eb42b8', history: 'grey'})
+            }}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={props.historyChange}>
-            <Icon name='history' size={30} color='#eb42b8'/>
+            <Icon name='history' size={30} color={buttons.history} onPress={()=>{
+               setButtons({home: 'grey', calendar: 'grey', history: '#eb42b8'})
+            }}/>
         </TouchableOpacity>
     </View>
   );
@@ -38,9 +45,10 @@ const style = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 20,
-        backgroundColor: 'transparent',
+        backgroundColor: '#fff',
         borderTopWidth: 0.7,
-        borderTopColor: 'grey'
+        borderTopColor: 'grey',
+
     },
     text:{
         fontWeight: 'bold',

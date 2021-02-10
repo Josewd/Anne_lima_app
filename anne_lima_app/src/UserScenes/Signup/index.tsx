@@ -1,145 +1,146 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
-import { View, Text, StatusBar , Alert, Image, ActivityIndicator} from 'react-native'
+import { View, Text, StatusBar , ImageBackground, Image, ActivityIndicator, Alert} from 'react-native'
 import { SignUpNavigationProp } from './types'
 import { useNavigation } from '@react-navigation/native'
-import { UserInfoContext } from '../../contexts/UserContext';
 import { SignUpPageText } from './text';
 import {  style } from './style'
 import { InputDefault } from '../components/InputDefault';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ButtonLink } from '../components/ButtonLink';
-import { anne_api } from '../../services/anne_api';
 import { HelperText } from 'react-native-paper'
-import { PhoneInput } from '../components/PhoneMasketInput';
 import { DateInput } from '../components/DateMaskedInput';
-import { storeTokenData, storeUserData, validateEmail } from '../../constant';
-import { UserInterface } from '../../Global/UserProvider'
+import { validateEmail } from '../../constant';
+import database from '@react-native-firebase/database'
+import { UserInfoContext } from '../../contexts/UserContext';
+
+
 
 export const SignUp:FunctionComponent = ()=> {
-    const [showPassword, setShowPassword] = useState(true)
     const [showHelper, setShowHelper] = useState(false)
-    const { setUserState} = useContext(UserInfoContext)
     const navigator = useNavigation<SignUpNavigationProp>()
+    const [emailPin, setEmailPin] = useState({email: ''})
+    const { user } = useContext(UserInfoContext)
+    const [loading, setLoading] = useState(false)
+    const [firstScene, setFirstScene] = useState(true)
+    const [errorMessage, setErrorMessage]=useState('')
     const [form, setForm] = useState({name: '',
-                                      email: '', 
-                                      password: '', 
                                       phone_number:'',
                                       birthday: '',
                                       role: 'normal'
                                     })
-    const [confirmPassword, setConfirmPassword] = useState('')
-    const [loading, setLoading] = useState(false)
-
-    const SignUpHandle = async()=>{
-        if(validateEmail(form.email)){
-            anne_api.post('/user', form)
-            .then(res=>{
-              const user: UserInterface = res.data.user
-        storeUserData(user)
-        storeTokenData(res.data.token)
-        setUserState({
-          id: user.id,
-          name: user.name,
-          birthday: user.birthday,
-          email: user.email,
-          phone_number: user.phone_number,
-          role: user.role,
-          avatar: user.avatar
+    const savingUserToDataBase = ()=>{
+     database().ref(`/user/${user?.uid}`).set({
+      name: form.name,
+      email: emailPin.email,
+      birthday: form.birthday,
+      role: form.role
+    }).then(()=>{
+        console.log('user saved!')
+      }).catch(err=> console.log(err))
+      user?.updateProfile({
+        displayName: form.name
       })
-      console.log(res.data)
-      navigator.navigate('mainPage')
-        setShowHelper(false)
-      }).catch(err=>{
-        console.log(err.message)
+      try {
+        user?.updateEmail(emailPin.email)
+        navigator.navigate('uploadProfileImg') 
+      } catch (error) {
+        setErrorMessage(error.message)
         setShowHelper(true)
-        setLoading(false)
-      })
-        }else{
-            Alert.alert('invalid email')
-        }
+      }
     }
 
-  return (
-    <View>
-    <StatusBar translucent backgroundColor='transparent'/>
-
-    <View style={style.containerAbsolute}>
-      <View style={{alignItems: 'center'}}>
-        <Image style={{width: 90, height:40, marginBottom: -30}}source={require('../../assets/img/brushLogo.png')}/>
+    const SignUpHandle = async()=>{
+        if(validateEmail(emailPin.email)){
+     
+          setFirstScene(false)
+          }else{
+            setErrorMessage('Email is invalid')
+            setShowHelper(true)  
+          }
+  }
+const page = firstScene? <View>
+                <StatusBar translucent backgroundColor='transparent'/>
+                <ImageBackground
+                  style={style.backgroundImage} 
+                  source={require('../../assets/img/manicure.jpg')}
+                >
+                </ImageBackground>
+                <View style={style.containerAbsolute}>
+                  <View style={{alignItems: 'center'}}>
+                    <Image 
+                      style={style.logo}
+                      source={require('../../assets/img/brushLogo.png')}
+                    />
+            <Text style={style.title}>{SignUpPageText.TITLE}</Text>
+          </View>
+            <Text style={style.subTitle}>Create your account</Text>
+                <InputDefault
+                  secureTextEntry={false}
+                  icon='email'
+                  value={emailPin.email}
+                  onChangeText={(text)=> {setEmailPin({...emailPin, email: text})}}
+                  placeholder='exemple@exemple.com'
+                />
+                  <HelperText
+                    type="error"
+                    visible={showHelper}
+                    style={style.labelError}>
+                    {errorMessage}
+                  </HelperText>
+                
+                    <PrimaryButton
+                     text='Next'
+                     onClick={SignUpHandle}
+                    />
+                  
+                <ButtonLink 
+                  text='Already have an account? '
+                  boldText='Log in'
+                  onClick={()=>navigator.navigate('login')}
+                />
+            </View>
+        </View> : 
+         <View>
+           <StatusBar translucent backgroundColor='transparent'/>
+                <ImageBackground
+                  style={style.backgroundImage} 
+                  source={require('../../assets/img/manicure.jpg')}
+                >
+                </ImageBackground>
+                <View style={style.containerAbsolute}>
+                  <View style={{alignItems: 'center'}}>
+                    <Image 
+                      style={style.logo}
+                      source={require('../../assets/img/brushLogo.png')}
+                    />
         <Text style={style.title}>{SignUpPageText.TITLE}</Text>
       </View>
         <Text style={style.subTitle}>Create your account</Text>
-        
-        <InputDefault
-            secureTextEntry={false}
-            icon='user'
-            value={form.name}
-            onChangeText={(text)=> {setForm({...form, name: text})}}
-            placeholder='name'
-          />
-          <InputDefault
-            secureTextEntry={false}
-            icon='email'
-            value={form.email}
-            onChangeText={(text)=> {setForm({...form, email: text})}}
-            placeholder='exemple@exemple.com'
-          />
-           <PhoneInput
-            icon='phone'
-            value={form.phone_number}
-            onChangeText={(text)=> {setForm({...form, phone_number: text})}}
-            placeholder='353 83 234 2345'
-          />
-           <DateInput
-            icon='calendar'
-            value={form.birthday}
-            onChangeText={(text)=> {setForm({...form, birthday: text})}}
-            placeholder='dd/mm/yyyy'
-          />
-           <InputDefault
-            secureTextEntry={showPassword}
-            icon='lock'
-            value={form.password}
-            onChangeText={(text)=> setForm({...form, password: text})}
-            placeholder='password'
-            iconEye={true}
-            onClick={()=> setShowPassword(!showPassword)}
-          />
-           <InputDefault
-            secureTextEntry={showPassword}
-            icon='lock'
-            value={confirmPassword}
-            onChangeText={(text)=> {
-                if(text !== form.password){
-                    setShowHelper(true)
-                }else{
-                    setShowHelper(false)
-                }
-                setConfirmPassword(text)
-            }
-            }
-            placeholder='confirm password'
-            iconEye={true}
-            onClick={()=> setShowPassword(!showPassword)}
-          />
-          <HelperText
-              type="error"
-              visible={showHelper}
-              style={style.labelError}>
-              {SignUpPageText.ERROR_MESSAGE}
-            </HelperText>
-
-            {loading? <ActivityIndicator size="large" color='#eb42b8'/> :<PrimaryButton
-            text='Sign Up'
-            onClick={SignUpHandle}
-          />}
-          <ButtonLink 
-            text='Already have an account? '
-            boldText='Log in'
-            onClick={()=>navigator.navigate('login')}
-          />
+            <InputDefault
+              secureTextEntry={false}
+              icon='user'
+              value={form.name}
+              onChangeText={(text)=> {setForm({...form, name: text})}}
+              placeholder='username'
+            />
+            <DateInput
+              icon='calendar'
+              value={form.birthday}
+              onChangeText={(text)=> {setForm({...form, birthday: text})}}
+              placeholder='dd/mm/yyyy'
+            />
+          
+              {loading? <ActivityIndicator size="large" color='#eb42b8'/> :<PrimaryButton
+              text='Next'
+              onClick={()=>savingUserToDataBase()}
+            />}
+            <ButtonLink 
+              text='Already have an account? '
+              boldText='Log in'
+              onClick={()=>navigator.navigate('login')}
+            />
       </View>
   </View>
-  );
+    return page
+    
 }
-

@@ -11,7 +11,7 @@ type TextInputMaskProps = {
 };
 
 export const PhoneInput: FunctionComponent<TextInputMaskProps> = (props) => {
-  const phoneMask = '+[000] [00] [000]-[0000]';
+  const phoneMask = '+[000] [00] [0000]-[0000]';
  
   return (
 
