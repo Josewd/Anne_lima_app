@@ -5,3 +5,5 @@ export type UploadProfileImgNavigationProp = StackNavigationProp<
   UserStackNavigation,
   'uploadProfileImg'
 >;
+
+export type image = {uri: string|undefined }

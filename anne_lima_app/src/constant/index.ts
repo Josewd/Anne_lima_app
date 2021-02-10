@@ -1,42 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import {v4} from "uuid";
 
-export const storeUserData = async (value:any) => {
-  try {
-    const jsonValue = JSON.stringify(value)
-    await AsyncStorage.setItem('user', jsonValue)
-  } catch (e) {
-    // saving error
-  }
-}
-
-
-
-export const getUserData = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem('user')
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
-  } catch(e) {
-    // error reading value
-  }
-}
-
-export const storeTokenData = async (value:any) => {
-  try {
-    await AsyncStorage.setItem('token', value)
-  } catch (e) {
-    // saving error
-  }
-}
-
-
-
-export const getTokenData = async () => {
-  try {
-    const value = await AsyncStorage.getItem('token')
-    return value
-  } catch(e) {
-    // error reading value
-  }
+export function generateId(): string{
+    return v4();
 }
 
 export const validateEmail = (email:string) => {

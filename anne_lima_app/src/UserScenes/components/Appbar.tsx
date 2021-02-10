@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { Text, Switch, StyleSheet, SafeAreaView, View, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Avatar } from 'react-native-paper';
 
 type AppBarProps = {

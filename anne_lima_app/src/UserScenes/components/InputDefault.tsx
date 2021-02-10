@@ -7,9 +7,10 @@ type inputProps = {
     icon: string;
     iconEye?: boolean
     placeholder?: string
-    secureTextEntry: boolean;
+    secureTextEntry?: boolean;
     onChangeText?: (text:string)=>void;
-    value: string;
+    value: string | number
+    keyboardType?: string
 
 }
 
@@ -21,6 +22,7 @@ export const InputDefault: FunctionComponent<inputProps> = (props)=> {
         </View>
     
         <TextInput
+          keyboardType={props.keyboardType? 'numeric': 'default'}
           style={style.input}
           value={props.value}
           placeholder={props.placeholder}
