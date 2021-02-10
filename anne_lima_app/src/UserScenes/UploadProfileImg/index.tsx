@@ -3,7 +3,7 @@ import { Alert, Image, ImageBackground, Platform, StatusBar, Text, TouchableOpac
 import * as ImagePicker from 'react-native-image-picker'
 import storage from '@react-native-firebase/storage'
 import auth from '@react-native-firebase/auth'
-import {UploadProfileImgNavigationProp} from './types'
+import {UploadProfileImgNavigationProp, image} from './types'
 import { useNavigation } from '@react-navigation/native';
 import { MediaType } from 'react-native-image-picker';
 import { style } from './style';
@@ -12,7 +12,6 @@ import { PrimaryButton } from '../components/PrimaryButton';
 
  const UploadProfileImg: FunctionComponent =()=> {
      const navigator = useNavigation<UploadProfileImgNavigationProp>()
-     type image = {uri: string|undefined }
     const [image, setImage] = useState({}as image);
 
     const selectImage = () => {
@@ -41,7 +40,7 @@ import { PrimaryButton } from '../components/PrimaryButton';
         const filename = user?.uid
         const uploadUri = Platform.OS === 'ios' ? uri?.replace('file://', '') : uri 
         const task = storage()
-          .ref(filename)
+          .ref(`users/${filename}`)
           .putFile(uploadUri as string);
         
         try {

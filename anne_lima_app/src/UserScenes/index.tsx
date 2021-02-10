@@ -9,6 +9,7 @@ import { MainPage } from './MainPage'
 import UploadProfileImg from './UploadProfileImg';
 import VerifyPhone from './verifyPhone';
 import UserProfile from './UserProfile';
+import Service from './CreateService';
 
 const StartStack = createStackNavigator<UserStackNavigation>()
 
@@ -18,7 +19,7 @@ export const MainNavigation: FunctionComponent = ()=> {
     <NavigationContainer>
       <UserProvider>
         <StartStack.Navigator
-        initialRouteName='login' 
+        initialRouteName='services' 
         screenOptions={{headerShown: false}}>
           <StartStack.Screen name="login" component={Login} />
           <StartStack.Screen name="mainPage" component={MainPage} />
@@ -26,6 +27,7 @@ export const MainNavigation: FunctionComponent = ()=> {
           <StartStack.Screen name="verifyPhone" component={VerifyPhone} />
           <StartStack.Screen name="userProfile" component={UserProfile}/>
           <StartStack.Screen name="uploadProfileImg" component={UploadProfileImg} />
+          <StartStack.Screen name="services" component={Service} />
         </StartStack.Navigator>
       </UserProvider>
     </NavigationContainer>
