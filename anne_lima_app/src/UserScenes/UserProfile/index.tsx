@@ -15,7 +15,7 @@ import { style } from './style'
  
 const UserProfile: FunctionComponent= ()=> {
     const navigator = useNavigation<UserProfileNavigationProp>()
-    const { user, setUser } = useContext(UserInfoContext)
+    const { user, setUser, } = useContext(UserInfoContext)
     const [loading, setLoading] = useState(false)
     const [userInfo, setUserInfo]= useState({} as userDb)
     useEffect(()=>{
@@ -43,7 +43,7 @@ const UserProfile: FunctionComponent= ()=> {
                 const updatedUser = auth().currentUser
                 setUser(updatedUser)
                 console.log(user)
-                navigator.navigate('userProfile')
+                navigator.navigate('login')
                 
             } catch (error) {
                Alert.alert(error.message) 
@@ -89,10 +89,20 @@ const UserProfile: FunctionComponent= ()=> {
            <ButtonLink 
                 text='Do you want to leave?' 
                 boldText='log out'
-                onClick={()=>{}}
+                onClick={async()=>{
+                    auth().signOut()
+                    navigator.navigate('login') 
+                }}
                 />
           </View>
-      <BottomBar homeChange={()=> navigator.navigate('mainPage')}/>
+      <BottomBar homeChange={()=> navigator.navigate('mainPage')}
+        settingChange={()=>{ 
+           if( userInfo.role === 'admin'){
+            navigator.navigate('adminPage')
+           }else{
+            navigator.navigate('userProfile')}
+        }}
+      />
   </View>
   );
 }

@@ -8,20 +8,22 @@ import { ScrollHorizontal } from '../components/ScrollHorizontal';
 import { BottomBar } from '../components/BottomBarIcons';
 import { style } from './style'
 import { UserInfoContext } from '../../contexts/UserContext';
-import auth from '@react-native-firebase/auth'
+import  database from '@react-native-firebase/database'
 
 export const MainPage: FunctionComponent = ()=> {
-    const {user} = useContext(UserInfoContext) 
+    const {user, userDB} = useContext(UserInfoContext) 
     const navigator = useNavigation<MainPageNavigationProp>()
     if(!user){
         navigator.navigate('login')
     }
+
     const [professionals, setProf] = useState([])
     const [services, setServices] = useState([])
   
    const [searchQuery, setSearchQuery] = React.useState('');
    const image = {uri: user?.photoURL}
    const onChangeSearch = (query:string) => setSearchQuery(query);
+  
   return (
     <View style={style.background}>
         <Appbar
@@ -50,7 +52,15 @@ export const MainPage: FunctionComponent = ()=> {
                 {services}
             </ScrollHorizontal>
         </View>
-        <BottomBar/>
+        <BottomBar
+         homeChange={()=> navigator.navigate('mainPage')}
+         settingChange={()=>{ 
+            if( userDB?.role === 'admin'){
+             navigator.navigate('adminPage')
+            }else{
+             navigator.navigate('userProfile')}
+         }}
+        />
     </View>
   );
 }

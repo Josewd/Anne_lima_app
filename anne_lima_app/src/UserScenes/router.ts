@@ -6,5 +6,6 @@ export type UserStackNavigation = {
     uploadProfileImg: undefined;
     verifyPhone: undefined;
     userProfile: undefined;
-    services: undefined
+    services: undefined;
+    adminPage: undefined;
 }

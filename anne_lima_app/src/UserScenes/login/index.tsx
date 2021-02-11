@@ -17,11 +17,10 @@ const Login:FunctionComponent = ()=>{
     const [code, setCode] = useState('');
     const [phoneNumber, setphoneNumber] = useState('')
     const { user } = useContext(UserInfoContext)
-    if(user){
+    if(user?.uid){
       navigator.navigate('mainPage')
     }
     async function verifyPhoneNumber() {
-      auth().signOut()
         const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
         console.log(confirmation)
         setConfirm(confirmation);
