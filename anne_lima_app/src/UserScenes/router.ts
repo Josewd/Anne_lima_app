@@ -1,3 +1,5 @@
+import { service } from "./MainPage/types";
+
 export type UserStackNavigation = {
     login: undefined;
     signUp: undefined;
@@ -6,6 +8,7 @@ export type UserStackNavigation = {
     uploadProfileImg: undefined;
     verifyPhone: undefined;
     userProfile: undefined;
-    services: undefined;
+    services: {service: service, id: string} |undefined;
     adminPage: undefined;
+    seeServices: undefined;
 }

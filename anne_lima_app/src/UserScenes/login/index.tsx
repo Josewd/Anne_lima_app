@@ -1,14 +1,14 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import { Text, View, StatusBar, Image, ImageBackground} from 'react-native';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { PhoneInput } from '../components/PhoneMasketInput';
+import { PhoneInput } from '../components/inputs/PhoneMasketInput';
 import { style } from './style'
-import { ButtonLink } from '../components/ButtonLink';
-import { PrimaryButton } from '../components/PrimaryButton';
+import { ButtonLink } from '../components/buttons/ButtonLink';
+import { PrimaryButton } from '../components/buttons/PrimaryButton';
 import { LoginNavigationProp } from './types'
 import { useNavigation } from '@react-navigation/native';
-import { InputDefault } from '../components/InputDefault';
-import { UserInfoContext } from '../../contexts/UserContext';
+import { InputDefault } from '../components/inputs/InputDefault';
+import { UserInfoContext } from '../../Context';
 
 const Login:FunctionComponent = ()=>{
     const navigator = useNavigation<LoginNavigationProp>()

@@ -1,3 +1,4 @@
+import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { UserStackNavigation} from '../router';
 
@@ -6,12 +7,7 @@ export type ServicesNavigationProp = StackNavigationProp<
   'services'
 >;
 
-export type userDb = {
-    name: any;
-    email: any;
-    birthday: any;
-    role:any;
-  }
+export type ServiceScreenRouteProp = RouteProp<UserStackNavigation, 'services'>;
 
 export type service = {
     title: string;

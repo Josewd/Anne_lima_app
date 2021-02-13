@@ -1,4 +1,4 @@
-import { StyleSheet, ViewStyle } from 'react-native'
+import { StyleSheet } from 'react-native'
 
 export const style = StyleSheet.create({
     backgroundDark:{
@@ -26,12 +26,23 @@ export const style = StyleSheet.create({
         fontWeight: 'bold', 
         color: '#fff', 
         fontSize: 18,
-        marginBottom: 10 
+        marginBottom: 100 
     },
     bkImage:{
         width: '100%', 
         height: '100%' ,
         alignItems:'center', 
         justifyContent:'flex-end'
+    },
+    serviceLabel: {
+        fontWeight: 'bold',
+        fontSize: 20,
+        color: '#000',
+        textAlign: 'left',
+        marginLeft: 10,
+        marginBottom: 10  
+    },
+    flatListView:{
+        height: 380
     }
 })

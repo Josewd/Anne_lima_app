@@ -1,34 +1,44 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
+import React, { FunctionComponent, memo,  useContext } from 'react';
 import { useNavigation } from '@react-navigation/native'
-import { MainPageNavigationProp } from './types';
-import { ImageBackground, StatusBar,  Text, View } from 'react-native';
-import { Searchbar } from 'react-native-paper';
-import { Appbar } from '../components/Appbar';
+import { MainPageNavigationProp, service } from './types';
+import { FlatList, ImageBackground, ListRenderItem, StatusBar,  Text, View } from 'react-native';
+import { Appbar } from '../components/barsNavigation/Appbar';
 import { ScrollHorizontal } from '../components/ScrollHorizontal';
-import { BottomBar } from '../components/BottomBarIcons';
+import { BottomBar } from '../components/barsNavigation/BottomBarIcons';
 import { style } from './style'
-import { UserInfoContext } from '../../contexts/UserContext';
-import  database from '@react-native-firebase/database'
+import { UserInfoContext } from '../../Context';
+import { ServiceCard } from '../components/Cards/ServiceCard';
 
-export const MainPage: FunctionComponent = ()=> {
-    const {user, userDB} = useContext(UserInfoContext) 
+export const MainPage:FunctionComponent = ()=> {
+    const {user, userDB, dataService} = useContext(UserInfoContext) 
     const navigator = useNavigation<MainPageNavigationProp>()
-    if(!user){
+    if(!user?.uid){
         navigator.navigate('login')
     }
-
-    const [professionals, setProf] = useState([])
-    const [services, setServices] = useState([])
-  
-   const [searchQuery, setSearchQuery] = React.useState('');
-   const image = {uri: user?.photoURL}
-   const onChangeSearch = (query:string) => setSearchQuery(query);
+    
+   const renderItem : ListRenderItem<service> = ({item, index})=>{
+        if(item.available){
+        return <View>
+            <ServiceCard key={index}
+            title={item.title}
+            duration={item.duration}
+            image={item.id}
+            price={item.price}
+            description={item?.description}
+            button='book'
+            onClick={()=>{}}
+            />
+            </View>
+        }else{
+            return <></>
+        }
+   }
   
   return (
     <View style={style.background}>
         <Appbar
         onClick={()=> navigator.navigate('userProfile')}
-        image={image}
+        image={{uri: user?.photoURL}}
         text={`Welcome, ${user?.displayName} !`}
          />
       <StatusBar translucent backgroundColor='transparent'/>
@@ -37,21 +47,20 @@ export const MainPage: FunctionComponent = ()=> {
             style={style.bkImage}
             source={require('../../assets/img/pedicure2.png')}>
             <Text style={style.title}>Find and book the best services in town!</Text>
-            <Searchbar
-             iconColor='#eb42b8'
-             style={style.serchBar}
-             placeholder="Manicure Shellac"
-             onChangeText={onChangeSearch}
-             value={searchQuery}
-            />
+           
             </ImageBackground>
-            <ScrollHorizontal title='Our Specialists:'>
-                {professionals}
-            </ScrollHorizontal>
-            <ScrollHorizontal title='Our Services:'>
-                {services}
-            </ScrollHorizontal>
+        <ScrollHorizontal  horizontal={true} title='Ours Specialists'>
+
+        </ScrollHorizontal>
         </View>
+            <View style={style.flatListView}>
+                <Text style={style.serviceLabel}>Ours Services: </Text>
+              <FlatList
+                data={dataService}
+                renderItem={(item)=> renderItem(item)}
+                keyExtractor={item => item.id}
+                />
+            </View>
         <BottomBar
          homeChange={()=> navigator.navigate('mainPage')}
          settingChange={()=>{ 

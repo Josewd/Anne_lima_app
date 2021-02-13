@@ -1,13 +1,13 @@
 import React, { FunctionComponent, useState } from 'react';
 import { Text, View, StatusBar, Image, ImageBackground} from 'react-native';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { PhoneInput } from '../components/PhoneMasketInput';
+import { PhoneInput } from '../components/inputs/PhoneMasketInput';
 import { style } from './styles'
-import { ButtonLink } from '../components/ButtonLink';
-import { PrimaryButton } from '../components/PrimaryButton';
+import { ButtonLink } from '../components/buttons/ButtonLink';
+import { PrimaryButton } from '../components/buttons/PrimaryButton';
 import { VerifyPhoneNavigationProp } from './types'
 import { useNavigation } from '@react-navigation/native';
-import { InputDefault } from '../components/InputDefault';
+import { InputDefault } from '../components/inputs/InputDefault';
 
 const VerifyPhone:FunctionComponent = ()=>{
     const navigator = useNavigation<VerifyPhoneNavigationProp>()

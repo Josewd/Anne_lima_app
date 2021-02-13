@@ -7,7 +7,7 @@ import {UploadProfileImgNavigationProp, image} from './types'
 import { useNavigation } from '@react-navigation/native';
 import { MediaType } from 'react-native-image-picker';
 import { style } from './style';
-import { PrimaryButton } from '../components/PrimaryButton';
+import { PrimaryButton } from '../components/buttons/PrimaryButton';
  
 
  const UploadProfileImg: FunctionComponent =()=> {

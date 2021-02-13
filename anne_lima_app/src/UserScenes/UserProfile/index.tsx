@@ -1,21 +1,21 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
 import { Alert, Text, View, ActivityIndicator } from 'react-native';
-import { UserInfoContext } from '../../contexts/UserContext';
-import { BottomBar } from '../components/BottomBarIcons';
-import { ProfileTopBar } from '../components/ProfileTopBar';
+import { UserInfoContext } from '../../Context';
+import { BottomBar } from '../components/barsNavigation/BottomBarIcons';
+import { ProfileTopBar } from '../components/barsNavigation/ProfileTopBar';
 import { UserProfileNavigationProp, userDb} from './types'
 import database from '@react-native-firebase/database'
-import { InputDefault } from '../components/InputDefault';
-import { PrimaryButton } from '../components/PrimaryButton';
-import { ButtonLink } from '../components/ButtonLink';
-import { DateInput } from '../components/DateMaskedInput'
+import { InputDefault } from '../components/inputs/InputDefault';
+import { PrimaryButton } from '../components/buttons/PrimaryButton';
+import { ButtonLink } from '../components/buttons/ButtonLink';
+import { DateInput } from '../components/inputs/DateMaskedInput'
 import auth from '@react-native-firebase/auth'
 import { style } from './style'
  
 const UserProfile: FunctionComponent= ()=> {
     const navigator = useNavigation<UserProfileNavigationProp>()
-    const { user, setUser, } = useContext(UserInfoContext)
+    const { user } = useContext(UserInfoContext)
     const [loading, setLoading] = useState(false)
     const [userInfo, setUserInfo]= useState({} as userDb)
     useEffect(()=>{
@@ -23,8 +23,8 @@ const UserProfile: FunctionComponent= ()=> {
         .on('value', querySnapShot => {
             let data = querySnapShot.val() ? querySnapShot.val() : {};
             setUserInfo({...data})
-        console.log(userInfo)})
-        }, [user])
+       })
+    }, [user])
 
         const handleUpdate = async ()=>{
             setLoading(true)
@@ -40,10 +40,7 @@ const UserProfile: FunctionComponent= ()=> {
                     displayName: userInfo.name
                 })
                 setLoading(false)
-                const updatedUser = auth().currentUser
-                setUser(updatedUser)
-                console.log(user)
-                navigator.navigate('login')
+                navigator.navigate('mainPage')
                 
             } catch (error) {
                Alert.alert(error.message) 

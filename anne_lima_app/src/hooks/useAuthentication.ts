@@ -1,11 +1,20 @@
-import { getTokenData } from "../constant";
+import auth from '@react-native-firebase/auth'
+import { useEffect, useState } from 'react'
 
-export function useAuthentication (){
-   const token  = getTokenData().then(data=> data)
-   .catch(err=> false)
-    if(!token){
-        return false
-    }else{
-        return true
+
+export const useAuth = () => {
+    const [state, setState] = useState(() => {
+         const user = auth().currentUser 
+         return { initializing: !user, user, } 
+        })
+    function onChange(user: any) {
+      setState({ initializing: false, user })
     }
-}
+  
+    useEffect(() => {
+      const unsubscribe = auth().onAuthStateChanged(onChange)
+      return () => unsubscribe()
+    }, [])
+  
+    return state
+  }

@@ -4,14 +4,14 @@ import { SignUpNavigationProp } from './types'
 import { useNavigation } from '@react-navigation/native'
 import { SignUpPageText } from './text';
 import {  style } from './style'
-import { InputDefault } from '../components/InputDefault';
-import { PrimaryButton } from '../components/PrimaryButton';
-import { ButtonLink } from '../components/ButtonLink';
+import { InputDefault } from '../components/inputs/InputDefault';
+import { PrimaryButton } from '../components/buttons/PrimaryButton';
+import { ButtonLink } from '../components/buttons/ButtonLink';
 import { HelperText } from 'react-native-paper'
-import { DateInput } from '../components/DateMaskedInput';
+import { DateInput } from '../components/inputs/DateMaskedInput';
 import { validateEmail } from '../../constant';
 import database from '@react-native-firebase/database'
-import { UserInfoContext } from '../../contexts/UserContext';
+import { UserInfoContext } from '../../Context';
 
 
 

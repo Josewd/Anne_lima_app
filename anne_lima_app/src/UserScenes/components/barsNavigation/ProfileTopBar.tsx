@@ -14,7 +14,7 @@ export const ProfileTopBar: FunctionComponent<profileProps> = (props)=> {
   return (
         <ImageBackground 
           style={style.Image} 
-          source={require('../../assets/img/profilePage.jpg')}>
+          source={require('../../../assets/img/profilePage.jpg')}>
               <TouchableOpacity style={style.icon} onPress={props.onClick}>
                     <Icon size={30} color='#fff' name='arrow-back'/>
               </TouchableOpacity>

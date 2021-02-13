@@ -11,17 +11,22 @@ import VerifyPhone from './verifyPhone';
 import UserProfile from './UserProfile';
 import Service from './CreateService';
 import AdminPage from './AdminPage';
+import Splash from './splash';
+import SeeServices from './SeeServices';
+
 
 const StartStack = createStackNavigator<UserStackNavigation>()
 
 export const MainNavigation: FunctionComponent = ()=> {
+ 
 
   return (
     <NavigationContainer>
       <UserProvider>
         <StartStack.Navigator
-        initialRouteName='login' 
+        initialRouteName='splash' 
         screenOptions={{headerShown: false}}>
+          <StartStack.Screen name="splash" component={Splash} />
           <StartStack.Screen name="login" component={Login} />
           <StartStack.Screen name="mainPage" component={MainPage} />
           <StartStack.Screen name="signUp" component={SignUp} />
@@ -30,6 +35,7 @@ export const MainNavigation: FunctionComponent = ()=> {
           <StartStack.Screen name="uploadProfileImg" component={UploadProfileImg} />
           <StartStack.Screen name="adminPage" component={AdminPage} />
           <StartStack.Screen name="services" component={Service} />
+          <StartStack.Screen name="seeServices" component={SeeServices} />
         </StartStack.Navigator>
       </UserProvider>
     </NavigationContainer>

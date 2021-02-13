@@ -12,7 +12,7 @@ export const Appbar:FunctionComponent<AppBarProps> = (props)=> {
   return (
     <SafeAreaView style={ style.appBar}>
         <TouchableOpacity onPress={props.onClick} style={{marginHorizontal: 10, justifyContent:'flex-end'}}>
-        <Avatar.Image size={50} source={props.image}/>
+        <Avatar.Image key={props.text} size={50} source={props.image}/>
         </TouchableOpacity>
         <Text style={style.text}>{props.text}</Text>
     </SafeAreaView>

@@ -1,29 +1,20 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { UserInfoContext } from '../contexts/UserContext/'
+import { UserInfoContext } from '../Context'
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth'
 import storage from '@react-native-firebase/storage'
 import database from '@react-native-firebase/database'
 import { userDb } from '../UserScenes/UserProfile/types';
-export type UserInterface = {
-        id:string,
-        name:string,
-        birthday:string,
-        email:string,
-        phone_number:string,
-        role: string,
-        avatar: string;
-    }
+import { createArrayService } from '../constant';
+import { service } from '../UserScenes/MainPage/types';
+import { useAuth } from '../hooks/useAuthentication';
 
-
-export const UserProvider: FunctionComponent = (props)=>{
-    const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState({} as FirebaseAuthTypes.User);
+export const UserProvider = React.memo(function UserProvider(props) {
+  const [dataService, setDataService] = useState([]as service[])
   const [userDB, setUserDB]= useState({} as userDb)
 
-  // Handle user state changes
+  const { initializing, user } = useAuth()
+  
   async function onAuthStateChanged (user: any) {
-    setUser(user)
-    if (initializing) setInitializing(false);
      const url =  await storage().ref(`users/${user.uid}`)
       .getDownloadURL()
       auth().currentUser?.updateProfile({
@@ -34,17 +25,20 @@ export const UserProvider: FunctionComponent = (props)=>{
           let data = querySnapShot.val() ? querySnapShot.val() : {};
           setUserDB({...data})
       })
-      console.log(userDB)
+       database().ref(`/services`)
+    .on('value', querySnapShot => {
+        let data = querySnapShot.val() ? querySnapShot.val() : {};
+        setDataService([] as service[])
+        createArrayService(data, dataService, setDataService) 
+    })
   }
 
   useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
+    onAuthStateChanged(user)
   }, [user]);
- 
     return(
-        <UserInfoContext.Provider value={{user, setUser, userDB}}>
+        <UserInfoContext.Provider value={{user, dataService, userDB}}>
             {props.children}
         </UserInfoContext.Provider>
     )
-}
+})

@@ -1,9 +1,9 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { FunctionComponent, useContext } from 'react';
 import { ImageBackground, StyleSheet, Text, View } from 'react-native';
-import { UserInfoContext } from '../../contexts/UserContext';
-import { Appbar } from '../components/Appbar'
-import { BottomBar } from '../components/BottomBarIcons';
+import { UserInfoContext } from '../../Context';
+import { Appbar } from '../components/barsNavigation/Appbar'
+import { BottomBar } from '../components/barsNavigation/BottomBarIcons';
 import { SettingButton } from './components/SettingButton';
 import { AdminPageNavigationProp } from './types';
 import { style } from './style'
@@ -36,7 +36,7 @@ const AdminPage: FunctionComponent = ()=> {
        <SettingButton onClick={()=>navigator.navigate('services')}>
             new service
        </SettingButton>
-       <SettingButton>
+       <SettingButton onClick={()=>navigator.navigate('seeServices')}>
             Edit Service
        </SettingButton>
        </View>

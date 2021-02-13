@@ -3,6 +3,7 @@ import { Text, StyleSheet, ScrollView, View } from 'react-native';
 
 type ScrollProps = {
     title: string;
+    horizontal: boolean
 }
 
 export const ScrollHorizontal:FunctionComponent<ScrollProps> = (props)=> {
@@ -12,9 +13,8 @@ export const ScrollHorizontal:FunctionComponent<ScrollProps> = (props)=> {
       <View style={style.container}>
         <Text style={style.text}>{props.title}</Text>
         <ScrollView 
-        horizontal 
-        alwaysBounceHorizontal 
-        style={style.scroll}>
+        horizontal={props.horizontal}
+        style={props.horizontal? style.scroll : style.scrollVertical}>
             {props.children}
         </ScrollView>
       </View>
@@ -23,14 +23,22 @@ export const ScrollHorizontal:FunctionComponent<ScrollProps> = (props)=> {
 
 const style = StyleSheet.create({
     container: {
-        width: '100%',
+        width: '95%',
         marginTop: -40,
-        marginBottom: 60
+        marginBottom: 60,
+        alignSelf: 'center'
     },
     scroll: {
         flexDirection: 'row',
         width: '100%',
         paddingHorizontal: 10,
+        backgroundColor: 'transparent'
+    },
+    scrollVertical: {
+        flexDirection: 'row',
+        width: '100%',
+        paddingHorizontal: 10,
+        height: 250 * 1.3,
         backgroundColor: 'transparent'
     },
     text:{

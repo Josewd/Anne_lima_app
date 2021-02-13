@@ -4,36 +4,36 @@ import * as ImagePicker from 'react-native-image-picker'
 import { MediaType } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage'
 import { Alert, Image, Platform, Switch, Text, View } from 'react-native';
-import { UserInfoContext } from '../../contexts/UserContext';
-import { userDb, ServicesNavigationProp, service, image } from './types'
+import { UserInfoContext } from '../../Context';
+import { ServicesNavigationProp, service, image, ServiceScreenRouteProp } from './types'
 import { style } from './style'
-import { useNavigation } from '@react-navigation/native';
-import { InputDefault } from '../components/InputDefault';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { InputDefault } from '../components/inputs/InputDefault';
 import { generateId }from '../../constant'
-import { PrimaryButton } from '../components/PrimaryButton';
-import { ButtonLink } from '../components/ButtonLink';
-import { BottomBar } from '../components/BottomBarIcons';
+import { PrimaryButton } from '../components/buttons/PrimaryButton';
+import { ButtonLink } from '../components/buttons/ButtonLink';
+import { BottomBar } from '../components/barsNavigation/BottomBarIcons';
 import { HelperText } from 'react-native-paper';
 
 const Service: FunctionComponent = ()=> {
     const navigator = useNavigation<ServicesNavigationProp>()
-    const {user} = useContext(UserInfoContext)
-    const [userInfo, setUserInfo] = useState({} as userDb)
+    const route = useRoute<ServiceScreenRouteProp>()
+    const {user, userDB} = useContext(UserInfoContext)
     const [service, setService] = useState({} as service)
     const [image, setImage] = useState({}as image)
     const [showHelper, setShowHelper] = useState(false)
     
 
     useEffect(()=>{
-        database().ref(`/user/${user?.uid}`)
-        .on('value', querySnapShot => {
-            let data = querySnapShot.val() ? querySnapShot.val() : {};
-            setUserInfo({...data})
-        })
-        setService({...service, available:true})
+        if(route.params?.service){
+          const ser: service = route.params.service as service
+          setService(ser)
+        }else{
+          setService({...service, available:true})
+        }
     }, [user])
 
-    if(userInfo.role === 'normal'){
+    if(userDB?.role === 'normal'){
         Alert.alert('User not Allowed')
         navigator.navigate('mainPage')
     }
@@ -57,7 +57,12 @@ const Service: FunctionComponent = ()=> {
       };
 
     const handleAddService = async ()=>{
-        const id  = generateId()
+        let id: string = ''
+        if(route.params?.id){
+          id = route.params.id
+        }else{
+          id  = generateId()
+        }
         try {
             if(!service.title){
                 throw new Error('must send form')
@@ -95,7 +100,7 @@ const Service: FunctionComponent = ()=> {
               style={style.logo}
               source={require('../../assets/img/brushLogo.png')}
              />
-            <Text style={style.title}>New Service</Text>
+            <Text style={style.title}>{route.params?.id ? 'Edit Service': 'New Service'}</Text>
             {image.uri?(
             <>
             <Image 
@@ -134,6 +139,7 @@ const Service: FunctionComponent = ()=> {
           <InputDefault 
          icon='back-in-time'
          value={service.durationTime}
+         keyboardType='numeric'
          placeholder='Duration Minutes Ex: 45'
          onChangeText={(text:string)=>{
              setService({...service, durationTime: Number(text)})
