@@ -3,7 +3,6 @@
 name: Manual workflow
 
 on:
-  workflow_dispatch:
   push:
     tags: 
       - 'v*'
@@ -22,6 +21,7 @@ jobs:
         yarn install
         echo VERSION=$(node -e "console.log(require('./package.json').version);") >> $GITHUB_ENV
         echo 'Build v' ${{ env.VERSION }}
+    - name: 'Build v${{ env.VERSION }}'
     - uses: EndBug/add-and-commit@v9
       with:
         add: 'package.json README.md'
