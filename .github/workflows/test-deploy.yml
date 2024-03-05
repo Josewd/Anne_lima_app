@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: Manual workflow
+name: Build and Deploy to S3 by version
 
 on:
   push:
@@ -14,17 +14,18 @@ jobs:
         working-directory: ./anne_lima_app
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
       with:
-        node-version: 18.x
+        node-version: ${{ matrix.node-version }}
+    
     - run: |
         npm install
         echo VERSION=$(node -e "console.log(require('./package.json').version);") >> $GITHUB_ENV
-        echo 'Build v' ${{ env.VERSION }}
-    - name: 'Build v${{ env.VERSION }}'
-      uses: EndBug/add-and-commit@v9
-      with:
-        add: 'package.json README.md'
-        default_author: github_actions
-        message: 'Build v${{ env.VERSION }}'
+        
+    - name: 'Deploy v${{ env.VERSION }}'
+    - run: |
+        echo 'Deploy v${{ env.VERSION }}'
+         
           
