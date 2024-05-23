@@ -1,19 +1,72 @@
 {
-  "template": "# video-kargo-player\n## What's Changed\n{{CHANGELOG}}\n\n",
-  "categories": [
-    {
-      "title": "### Video Player",
-      "labels": ["enhancements", "enhancement"]
+    "categories": [
+        {
+            "title": "## Video Player",
+            "labels": ["video-player", "feat", "feature", "bugfix", "enhancement"]
+        },
+        {
+            "title": "### CI/CD",
+            "labels": ["ci", "cd", "infrastructure", "devops"]
+        },
+        {
+            "title": "### Other",
+            "labels": ["chore", "documentation", "refactor"]
+        },
+        {
+            "title": "## New Contributors",
+            "labels": ["first-contribution"]
+        }
+    ],
+    "ignore_labels": [
+        "ignore"
+    ],
+    "sort": {
+        "order": "DESC",
+        "on_property": "mergedAt"
     },
-    {
-      "title": "### CI/CD",
-      "labels": ["CI/CD"]
+    "template": "# {{REPO_NAME}}\n## What's Changed\n{{CATEGORIES}}\n\n**Full Changelog**: {{FULL_CHANGELOG_URL}}\n",
+    "category_template": "{{TITLE}}\n{{ENTRIES}}\n",
+    "entry_template": "* {{LABELS}} {{TITLE}} by @{{AUTHOR}} in {{PR_URL}}\n",
+    "empty_template": "- no changes",
+    "label_extractor": [
+        {
+            "pattern": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
+            "target": "$1"
+        }
+    ],
+    "duplicate_filter": {
+        "pattern": "\\[.*\\]",
+        "on_property": "title",
+        "method": "match"
     },
-    {
-      "title": "### Other",
-      "labels": ["Other"]
-    }
-  ],
-  "sort": "ASC",
-  "templateSeparator": "\n"
+    "reference": {
+        "pattern": ".*\\ #([0-9]+).*",
+        "on_property": "body",
+        "method": "replace",
+        "target": "$1"
+    },
+    "transformers": [
+        {
+            "pattern": "[\\-\\*] (\\[(feat|fix|docs|style|refactor|perf|test|chore)\\])( )?(.+?)\n(.+?[\\-\\*] )(.+)",
+            "target": "- $4\n  - $6"
+        }
+    ],
+    "trim_values": true,
+    "max_tags_to_fetch": 200,
+    "max_pull_requests": 200,
+    "max_back_track_time_days": 365,
+    "exclude_merge_branches": [
+        "Owner/qa"
+    ],
+    "tag_resolver": {
+        "method": "semver",
+        "filter": {
+            "pattern": "api-(.+)",
+            "flags": "gu"
+        }
+    },
+    "base_branches": [
+        "main",
+        "master"
+    ]
 }
