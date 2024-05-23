@@ -96,14 +96,10 @@ jobs:
           git push origin v$VERSION
 
       - name: Generate Release Notes
-        id: generate_release_notes
-        uses: mikepenz/release-changelog-builder-action@v4
+        id: notes
+        uses: RedCrafter07/release-notes-action@v1
         with:
-          commitMode: true
-          configuration: .github/workflows/release-changelog-config.json
-          tag: v${{ steps.validate_version.outputs.version }}
-          fromTag: "v0.2.12"
-          toTag: v${{ steps.validate_version.outputs.version }}
+          tag-name: v${{ steps.validate_version.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
@@ -113,6 +109,6 @@ jobs:
         with:
           tag_name: v${{ steps.validate_version.outputs.version }}
           release_name: v${{ steps.validate_version.outputs.version }}
-          body: ${{ steps.generate_release_notes.outputs.changelog }}
+          body: ${{ steps.notes.outputs.release-notes }}
           draft: false
           prerelease: false
