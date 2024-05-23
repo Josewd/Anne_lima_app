@@ -10,6 +10,7 @@ export const useAuth = () => {
     function onChange(user: any) {
       setState({ initializing: false, user })
     }
+    //comment to makes changes
   
     useEffect(() => {
       const unsubscribe = auth().onAuthStateChanged(onChange)
