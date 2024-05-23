@@ -65,7 +65,7 @@ jobs:
             });
       
             if (prs.data.length === 0) {
-              throw new Error(`Pull request for branch release/v${{ steps.validate_version.outputs.version }} not found`);
+              throw new Error(`Pull request for branch version-bump-${{ steps.validate_version.outputs.version }} not found`);
             }
       
             const prNumber = prs.data[0]?.number;
