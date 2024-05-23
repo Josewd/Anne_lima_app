@@ -54,19 +54,23 @@ jobs:
           body: 'Automated release of version v${{ steps.validate_version.outputs.version }}'
 
       - name: Wait for PR to be merged
+        id: wait_for_merge
         uses: actions/github-script@v4
-        id: wait_pr
         with:
           script: |
-            const prNumber = await github.pulls.list({
+            const prs = await github.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
               head: `release/v${{ steps.validate_version.outputs.version }}`,
-            }).then(prs => prs.data[0]?.number);
-
-            
-
+            });
+      
+            if (prs.data.length === 0) {
+              throw new Error(`Pull request for branch release/v${{ steps.validate_version.outputs.version }} not found`);
+            }
+      
+            const prNumber = prs.data[0]?.number;
+      
             let isMerged = false;
             while (!isMerged) {
               const { data: pr } = await github.pulls.get({
@@ -74,7 +78,7 @@ jobs:
                 repo: context.repo.repo,
                 pull_number: prNumber,
               });
-
+      
               if (pr.merged) {
                 isMerged = true;
               } else {
@@ -82,9 +86,8 @@ jobs:
                 await new Promise(resolve => setTimeout(resolve, 60000)); // Espera 1 minuto antes de verificar novamente
               }
             }
-
+      
             return { prNumber };
-
       - name: Merge Pull Request
         uses: actions/github-script@v4
         with:
