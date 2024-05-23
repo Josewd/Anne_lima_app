@@ -1,0 +1,113 @@
+name: Release New Player Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number to be released (must follow semantic versioning)'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Validate version
+        id: validate_version
+        run: |
+          VERSION=${{ github.event.inputs.version }}
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Version number must follow semantic versioning (MAJOR.MINOR.PATCH)"
+            exit 1
+          fi
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "Error: Tag v$VERSION already exists"
+            exit 1
+          fi
+          echo "::set-output name=version::$VERSION"
+
+      - name: Update package.json
+        run: |
+          VERSION=${{ steps.validate_version.outputs.version }}
+          jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
+          npm install
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git checkout -b release/v$VERSION
+          git commit -am "Bump version to v$VERSION"
+          git push origin release/v$VERSION
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Bump version to v${{ steps.validate_version.outputs.version }}
+          branch: release/v${{ steps.validate_version.outputs.version }}
+          title: 'Release v${{ steps.validate_version.outputs.version }}'
+          body: 'Automated release of version v${{ steps.validate_version.outputs.version }}'
+
+      - name: Wait for PR to be merged
+        uses: actions/github-script@v4
+        id: wait_pr
+        with:
+          script: |
+            const prNumber = await github.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              head: `release/v${{ steps.validate_version.outputs.version }}`,
+            }).then(prs => prs.data[0].number);
+            return { prNumber };
+
+      - name: Merge Pull Request
+        uses: actions/github-script@v4
+        with:
+          script: |
+            await github.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: ${{ steps.wait_pr.outputs.prNumber }},
+              merge_method: 'squash'
+            });
+
+      - name: Create Tag
+        run: |
+          VERSION=${{ steps.validate_version.outputs.version }}
+          git fetch --tags
+          git tag v$VERSION
+          git push origin v$VERSION
+
+      - name: Generate Release Notes
+        id: generate_release_notes
+        uses: mikepenz/release-changelog-builder-action@v2
+        with:
+          configuration: .github/release-changelog-config.json
+          tag: v${{ steps.validate_version.outputs.version }}
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v${{ steps.validate_version.outputs.version }}
+          release_name: v${{ steps.validate_version.outputs.version }}
+          body: ${{ steps.generate_release_notes.outputs.changelog }}
+          draft: false
+          prerelease: false
+
+      - name: Update BetaJS dependencies and create release notes
+        run: |
+          # Example for updating betajs-media-components, adapt as necessary
+          cd path/to/betajs-media-components
+          git fetch
+          # Check if there are changes and update if necessary
+          # Assuming the dependency is a git submodule or similar
+          if [[ `git status --porcelain` ]]; then
+            # Changes exist
+            VERSION=${{ steps.validate_version.outputs.version }}
+            git commit -am "Update dependencies for v$VERSION"
+            git push origin main
+            # Create a release on BetaJS repo
+            gh release create v$VERSION -t "Release v$VERSION" -n "Update dependencies for v$VERSION"
+          fi
