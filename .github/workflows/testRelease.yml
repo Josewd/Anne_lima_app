@@ -48,7 +48,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: master
-          title: Bump version to $VERSION
+          title: Bump version to ${{ steps.validate_version.outputs.version }}
           get_diff: true
           allow_no_diff: false
 
@@ -99,7 +99,7 @@ jobs:
         id: generate_release_notes
         uses: mikepenz/release-changelog-builder-action@v2
         with:
-          configuration: .github/release-changelog-config.json
+          configuration: .github/workflows/release-changelog-config.json
           tag: v${{ steps.validate_version.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
