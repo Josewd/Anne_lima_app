@@ -98,19 +98,3 @@ jobs:
           body: ${{ steps.generate_release_notes.outputs.changelog }}
           draft: false
           prerelease: false
-
-      - name: Update BetaJS dependencies and create release notes
-        run: |
-          # Example for updating betajs-media-components, adapt as necessary
-          cd path/to/betajs-media-components
-          git fetch
-          # Check if there are changes and update if necessary
-          # Assuming the dependency is a git submodule or similar
-          if [[ `git status --porcelain` ]]; then
-            # Changes exist
-            VERSION=${{ steps.validate_version.outputs.version }}
-            git commit -am "Update dependencies for v$VERSION"
-            git push origin main
-            # Create a release on BetaJS repo
-            gh release create v$VERSION -t "Release v$VERSION" -n "Update dependencies for v$VERSION"
-          fi
