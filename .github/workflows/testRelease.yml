@@ -97,7 +97,7 @@ jobs:
 
       - name: Generate Release Notes
         id: generate_release_notes
-        uses: mikepenz/release-changelog-builder-action@v2
+        uses: mikepenz/release-changelog-builder-action@v4
         with:
           commitMode: true
           configurationJson: |
