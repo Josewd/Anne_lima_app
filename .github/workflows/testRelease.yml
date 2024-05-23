@@ -48,7 +48,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: master
-          title: My pull request
+          title: Bump version to $VERSION
           get_diff: true
           allow_no_diff: false
 
@@ -87,17 +87,6 @@ jobs:
             }
       
             return { prNumber };
-
-      - name: Merge Pull Request
-        uses: actions/github-script@v4
-        with:
-          script: |
-            await github.pulls.merge({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: ${{ steps.wait_for_merge.outputs.prNumber }},
-              merge_method: 'squash'
-            });
 
       - name: Create Tag
         run: |
