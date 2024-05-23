@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Validate version
         id: validate_version
@@ -30,7 +30,7 @@ jobs:
             echo "Error: Tag v$VERSION already exists"
             exit 1
           fi
-          echo "::set-output name=version::$VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Update package.json
         run: |
@@ -39,30 +39,29 @@ jobs:
           npm install
           git config --global user.email "exageradonome@gmail.com"
           git config --global user.name "josewd"
-          git checkout -b release/v$VERSION
+          git checkout -b version-bump-$VERSION
           git commit -am "Bump version to v$VERSION"
-          git push origin release/v$VERSION
+          git push origin version-bump-$VERSION
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
+      - name: Create pull request
+        uses: devops-infra/action-pull-request@v0.5.5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit_message: Bump version to v${{ steps.validate_version.outputs.version }}
-          branch: release/v${{ steps.validate_version.outputs.version }}
-          base: master
-          title: 'Release v${{ steps.validate_version.outputs.version }}'
-          body: 'Automated release of version v${{ steps.validate_version.outputs.version }}'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          target_branch: master
+          title: Bump version to ${{ steps.validate_version.outputs.version }}
+          get_diff: true
+          allow_no_diff: false
 
       - name: Wait for PR to be merged
         id: wait_for_merge
-        uses: actions/github-script@v3
+        uses: actions/github-script@v4
         with:
           script: |
             const prs = await github.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              head: `release/v${{ steps.validate_version.outputs.version }}`,
+              head: `version-bump-${{ steps.validate_version.outputs.version }}`,
             });
       
             if (prs.data.length === 0) {
@@ -83,22 +82,11 @@ jobs:
                 isMerged = true;
               } else {
                 console.log(`PR #${prNumber} not merged yet. Waiting...`);
-                await new Promise(resolve => setTimeout(resolve, 60000)); // Espera 1 minuto antes de verificar novamente
+                await new Promise(resolve => setTimeout(resolve, 30000)); // Espera 30 secs antes de verificar novamente
               }
             }
       
             return { prNumber };
-
-      - name: Merge Pull Request
-        uses: actions/github-script@v4
-        with:
-          script: |
-            await github.pulls.merge({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: ${{ steps.wait_for_merge.outputs.prNumber }},
-              merge_method: 'squash'
-            });
 
       - name: Create Tag
         run: |
@@ -111,11 +99,38 @@ jobs:
         id: generate_release_notes
         uses: mikepenz/release-changelog-builder-action@v2
         with:
-          configuration: .github/release-changelog-config.json
+          commitMode: true
+          configurationJson: |
+            {
+              "template": "#{{CHANGELOG}}",
+              "categories": [
+                {
+                    "title": "## Feature",
+                    "labels": ["feat", "feature"]
+                },
+                {
+                    "title": "## Fix",
+                    "labels": ["fix", "bug"]
+                },
+                {
+                    "title": "## Other",
+                    "labels": []
+                }
+              ],
+              "label_extractor": [
+                {
+                  "pattern": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
+                  "target": "$1"
+                }
+              ],
+            }
           tag: v${{ steps.validate_version.outputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
           tag_name: v${{ steps.validate_version.outputs.version }}
           release_name: v${{ steps.validate_version.outputs.version }}
