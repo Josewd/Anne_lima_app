@@ -95,16 +95,16 @@ jobs:
           git tag v$VERSION
           git push origin v$VERSION
 
-      - name: Generate Release Notes
-        id: generate_release_notes
-        uses: mikepenz/release-changelog-builder-action@v4
-        with:
-          commitMode: true
-          configuration: .github/workflows/release-changelog-config.json
-          tag: v${{ steps.validate_version.outputs.version }}
-          fromTag: "v0.2.12"
-          toTag: v${{ steps.validate_version.outputs.version }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Generate Release Notes
+      #   id: generate_release_notes
+      #   uses: mikepenz/release-changelog-builder-action@v4
+      #   with:
+      #     commitMode: true
+      #     configuration: .github/workflows/release-changelog-config.json
+      #     tag: v${{ steps.validate_version.outputs.version }}
+      #     fromTag: "v0.2.12"
+      #     toTag: v${{ steps.validate_version.outputs.version }}
+      #     token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
@@ -113,6 +113,5 @@ jobs:
         with:
           tag_name: v${{ steps.validate_version.outputs.version }}
           release_name: v${{ steps.validate_version.outputs.version }}
-          body: ${{ steps.generate_release_notes.outputs.changelog }}
           draft: false
           prerelease: false
