@@ -65,9 +65,7 @@ jobs:
               head: `release/v${{ steps.validate_version.outputs.version }}`,
             }).then(prs => prs.data[0]?.number);
 
-            if (!prNumber) {
-              throw new Error(`Pull request for branch release/v${{ steps.validate_version.outputs.version }} not found`);
-            }
+            
 
             let isMerged = false;
             while (!isMerged) {
