@@ -30,7 +30,7 @@ jobs:
             echo "Error: Tag v$VERSION already exists"
             exit 1
           fi
-          echo "::set-output name=version::$VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Update package.json
         run: |
