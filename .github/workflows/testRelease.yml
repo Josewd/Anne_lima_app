@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Validate version
         id: validate_version
@@ -47,7 +47,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit_message: Bump version to v${{ steps.validate_version.outputs.version }}
+          commit-message: Bump version to v${{ steps.validate_version.outputs.version }}
           branch: release/v${{ steps.validate_version.outputs.version }}
           base: master
           title: 'Release v${{ steps.validate_version.outputs.version }}'
@@ -55,7 +55,7 @@ jobs:
 
       - name: Wait for PR to be merged
         id: wait_for_merge
-        uses: actions/github-script@v3
+        uses: actions/github-script@v4
         with:
           script: |
             const prs = await github.pulls.list({
