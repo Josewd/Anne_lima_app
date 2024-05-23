@@ -39,19 +39,26 @@ jobs:
           npm install
           git config --global user.email "exageradonome@gmail.com"
           git config --global user.name "josewd"
-          git checkout -b release/v$VERSION
+          git checkout -b version-bump-$VERSION
           git commit -am "Bump version to v$VERSION"
-          git push origin release/v$VERSION
+          git push origin version-bump-$VERSION
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
+      - name: Create pull request
+        uses: devops-infra/action-pull-request@v0.5.5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: Bump version to v${{ steps.validate_version.outputs.version }}
-          branch: release/v${{ steps.validate_version.outputs.version }}
-          base: master
-          title: 'Release v${{ steps.validate_version.outputs.version }}'
-          body: 'Automated release of version v${{ steps.validate_version.outputs.version }}'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          target_branch: master
+          title: My pull request
+          template: .github/PULL_REQUEST_TEMPLATE.md
+          body: "**Automated pull request**"
+          label: enhancement
+          milestone: My milestone
+          draft: true
+          old_string: "<!-- Add your description here -->"
+          new_string: "** Automatic pull request**"
+          get_diff: true
+          ignore_users: "dependabot"
+          allow_no_diff: false
 
       - name: Wait for PR to be merged
         id: wait_for_merge
@@ -62,7 +69,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              head: `release/v${{ steps.validate_version.outputs.version }}`,
+              head: `version-bump-${{ steps.validate_version.outputs.version }}`,
             });
       
             if (prs.data.length === 0) {
@@ -83,7 +90,7 @@ jobs:
                 isMerged = true;
               } else {
                 console.log(`PR #${prNumber} not merged yet. Waiting...`);
-                await new Promise(resolve => setTimeout(resolve, 60000)); // Espera 1 minuto antes de verificar novamente
+                await new Promise(resolve => setTimeout(resolve, 30000)); // Espera 30 secs antes de verificar novamente
               }
             }
       
