@@ -67,9 +67,7 @@ jobs:
             if (prs.data.length === 0) {
               throw new Error(`Pull request for branch version-bump-${{ steps.validate_version.outputs.version }} not found`);
             }
-      
             const prNumber = prs.data[0]?.number;
-      
             let isMerged = false;
             while (!isMerged) {
               const { data: pr } = await github.pulls.get({
@@ -85,9 +83,7 @@ jobs:
                 await new Promise(resolve => setTimeout(resolve, 30000)); // Espera 30 secs antes de verificar novamente
               }
             }
-      
             return { prNumber };
-
       - name: Create Tag
         run: |
           VERSION=${{ steps.validate_version.outputs.version }}
