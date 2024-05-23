@@ -58,18 +58,33 @@ jobs:
         id: wait_pr
         with:
           script: |
-            const prs = await github.pulls.list({
+            cconst prNumber = await github.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              head: `${context.repo.owner}:release/v${{ steps.validate_version.outputs.version }}`,
-            });
-      
-            if (prs.data.length === 0) {
+              head: `release/v${{ steps.validate_version.outputs.version }}`,
+            }).then(prs => prs.data[0]?.number);
+
+            if (!prNumber) {
               throw new Error(`Pull request for branch release/v${{ steps.validate_version.outputs.version }} not found`);
             }
-      
-            const prNumber = prs.data[0].number;
+
+            let isMerged = false;
+            while (!isMerged) {
+              const { data: pr } = await github.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+              });
+
+              if (pr.merged) {
+                isMerged = true;
+              } else {
+                console.log(`PR #${prNumber} not merged yet. Waiting...`);
+                await new Promise(resolve => setTimeout(resolve, 60000)); // Espera 1 minuto antes de verificar novamente
+              }
+            }
+
             return { prNumber };
 
       - name: Merge Pull Request
