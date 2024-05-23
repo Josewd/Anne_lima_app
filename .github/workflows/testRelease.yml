@@ -58,12 +58,18 @@ jobs:
         id: wait_pr
         with:
           script: |
-            const prNumber = await github.pulls.list({
+            const prs = await github.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              head: `release/v${{ steps.validate_version.outputs.version }}`,
-            }).then(prs => prs.data[0].number);
+              head: `${context.repo.owner}:release/v${{ steps.validate_version.outputs.version }}`,
+            });
+      
+            if (prs.data.length === 0) {
+              throw new Error(`Pull request for branch release/v${{ steps.validate_version.outputs.version }} not found`);
+            }
+      
+            const prNumber = prs.data[0].number;
             return { prNumber };
 
       - name: Merge Pull Request
