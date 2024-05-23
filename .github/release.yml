@@ -5,17 +5,13 @@ changelog:
   categories:
    - title: 📺 Video Player
       labels:
-        - VideoPlayer
         - player
     - title: 🚀 Features
       labels:
         - feature
-        - feat
     - title: 🐛 Bug Fixes
       labels:
         - bug
-        - fix
-        - bugfix
     - title: 🚀 Breaking Changes
       labels:
         - breaking-change
