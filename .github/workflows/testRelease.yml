@@ -37,25 +37,25 @@ jobs:
           VERSION=${{ steps.validate_version.outputs.version }}
           jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
           npm install
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
+          git config --global user.email "exageradonome@gmail.com"
+          git config --global user.name "josewd"
           git checkout -b release/v$VERSION
           git commit -am "Bump version to v$VERSION"
           git push origin release/v$VERSION
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: Bump version to v${{ steps.validate_version.outputs.version }}
+          commit_message: Bump version to v${{ steps.validate_version.outputs.version }}
           branch: release/v${{ steps.validate_version.outputs.version }}
-          base: master # ou develop, dependendo do seu branch de destino
+          base: master
           title: 'Release v${{ steps.validate_version.outputs.version }}'
           body: 'Automated release of version v${{ steps.validate_version.outputs.version }}'
 
       - name: Wait for PR to be merged
         id: wait_for_merge
-        uses: actions/github-script@v4
+        uses: actions/github-script@v3
         with:
           script: |
             const prs = await github.pulls.list({
@@ -88,6 +88,7 @@ jobs:
             }
       
             return { prNumber };
+
       - name: Merge Pull Request
         uses: actions/github-script@v4
         with:
@@ -95,7 +96,7 @@ jobs:
             await github.pulls.merge({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: ${{ steps.wait_pr.outputs.prNumber }},
+              pull_number: ${{ steps.wait_for_merge.outputs.prNumber }},
               merge_method: 'squash'
             });
 
