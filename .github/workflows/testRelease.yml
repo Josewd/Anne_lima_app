@@ -113,6 +113,25 @@ jobs:
         with:
           tag_name: v${{ steps.validate_version.outputs.version }}
           release_name: v${{ steps.validate_version.outputs.version }}
-          # body: ${{ steps.generate_release_notes.outputs.changelog }}
+          body: |
+            changelog:
+              exclude:
+                labels:
+                  - skip-changelog
+                authors:
+                  - dependabot[bot]
+              categories:
+                - title: 🚀 Features
+                  labels:
+                    - feature
+                - title: 🐛 Bug Fixes
+                  labels:
+                    - bug
+                - title: 🚀 Breaking Changes
+                  labels:
+                    - breaking-change
+                - title: Other Changes
+                  labels:
+                    - "*" 
           draft: false
           prerelease: false
