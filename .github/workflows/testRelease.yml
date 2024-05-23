@@ -100,30 +100,7 @@ jobs:
         uses: mikepenz/release-changelog-builder-action@v4
         with:
           commitMode: true
-          configurationJson: |
-            {
-              "template": "#{{CHANGELOG}}",
-              "categories": [
-                {
-                    "title": "## Feature",
-                    "labels": ["feat", "feature"]
-                },
-                {
-                    "title": "## Fix",
-                    "labels": ["fix", "bug"]
-                },
-                {
-                    "title": "## Other",
-                    "labels": []
-                }
-              ],
-              "label_extractor": [
-                {
-                  "pattern": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
-                  "target": "$1"
-                }
-              ],
-            }
+          configuration: .github/workflows/release-changelog-config.json
           tag: v${{ steps.validate_version.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
