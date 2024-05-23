@@ -2,7 +2,7 @@
     "categories": [
         {
             "title": "## Video Player",
-            "labels": ["video-player", "feat", "feature", "bugfix", "enhancement"]
+            "labels": ["video-player", "feat", "feature", "bug", "fix", "enhancement"]
         },
         {
             "title": "### CI/CD",
@@ -24,7 +24,7 @@
         "order": "DESC",
         "on_property": "mergedAt"
     },
-    "template": "# {{REPO_NAME}}\n## What's Changed\n{{CATEGORIES}}\n\n**Full Changelog**: {{FULL_CHANGELOG_URL}}\n",
+    "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
     "category_template": "{{TITLE}}\n{{ENTRIES}}\n",
     "entry_template": "* {{LABELS}} {{TITLE}} by @{{AUTHOR}} in {{PR_URL}}\n",
     "empty_template": "- no changes",
