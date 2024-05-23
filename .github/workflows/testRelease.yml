@@ -55,7 +55,7 @@ jobs:
 
       - name: Wait for PR to be merged
         id: wait_for_merge
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           script: |
             const prs = await github.pulls.list({
