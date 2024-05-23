@@ -102,7 +102,7 @@ jobs:
           commitMode: true
           configuration: .github/workflows/release-changelog-config.json
           tag: v${{ steps.validate_version.outputs.version }}
-          fromTag: "v0.2.11"
+          fromTag: "v0.2.12"
           toTag: v${{ steps.validate_version.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
