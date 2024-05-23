@@ -2,8 +2,6 @@ changelog:
   exclude:
     labels:
       - skip-changelog
-    authors:
-      - dependabot[bot]
   categories:
     - title: 🚀 Features
       labels:
