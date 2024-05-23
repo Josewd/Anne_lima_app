@@ -1,5 +1,5 @@
 {
-  "template": "# video-kargo-player\n## What's Changed\n{{CHANGELOG}}\n\n# betajs-media-components\n{{EXTERNAL_CHANGELOG}}\n",
+  "template": "# video-kargo-player\n## What's Changed\n{{CHANGELOG}}\n\n",
   "categories": [
     {
       "title": "### Video Player",
