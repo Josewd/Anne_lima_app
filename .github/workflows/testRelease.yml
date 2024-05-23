@@ -49,6 +49,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: Bump version to v${{ steps.validate_version.outputs.version }}
           branch: release/v${{ steps.validate_version.outputs.version }}
+          base: master # ou develop, dependendo do seu branch de destino
           title: 'Release v${{ steps.validate_version.outputs.version }}'
           body: 'Automated release of version v${{ steps.validate_version.outputs.version }}'
 
