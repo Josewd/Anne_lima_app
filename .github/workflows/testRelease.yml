@@ -99,7 +99,31 @@ jobs:
         id: generate_release_notes
         uses: mikepenz/release-changelog-builder-action@v2
         with:
-          configuration: .github/workflows/release-changelog-config.json
+          commitMode: true
+          configurationJson: |
+            {
+              "template": "#{{CHANGELOG}}",
+              "categories": [
+                {
+                    "title": "## Feature",
+                    "labels": ["feat", "feature"]
+                },
+                {
+                    "title": "## Fix",
+                    "labels": ["fix", "bug"]
+                },
+                {
+                    "title": "## Other",
+                    "labels": []
+                }
+              ],
+              "label_extractor": [
+                {
+                  "pattern": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
+                  "target": "$1"
+                }
+              ],
+            }
           tag: v${{ steps.validate_version.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -111,6 +135,5 @@ jobs:
           tag_name: v${{ steps.validate_version.outputs.version }}
           release_name: v${{ steps.validate_version.outputs.version }}
           body: ${{ steps.generate_release_notes.outputs.changelog }}
-          fromTag: "v0.2.1"
           draft: false
           prerelease: false
