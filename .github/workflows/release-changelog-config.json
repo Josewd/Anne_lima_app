@@ -1,0 +1,19 @@
+{
+  "template": "# video-kargo-player\n## What's Changed\n{{CHANGELOG}}\n\n# betajs-media-components\n{{EXTERNAL_CHANGELOG}}\n",
+  "categories": [
+    {
+      "title": "### Video Player",
+      "labels": ["Video Player"]
+    },
+    {
+      "title": "### CI/CD",
+      "labels": ["CI/CD"]
+    },
+    {
+      "title": "### Other",
+      "labels": ["Other"]
+    }
+  ],
+  "sort": "ASC",
+  "templateSeparator": "\n"
+}
