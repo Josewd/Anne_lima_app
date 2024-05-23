@@ -101,6 +101,7 @@ jobs:
         with:
           configuration: .github/release-changelog-config.json
           tag: v${{ steps.validate_version.outputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
