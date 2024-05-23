@@ -3,12 +3,19 @@ changelog:
     labels:
       - skip-changelog
   categories:
+   - title: 📺 Video Player
+      labels:
+        - Video Player
+        - player
     - title: 🚀 Features
       labels:
         - feature
+        - feat
     - title: 🐛 Bug Fixes
       labels:
         - bug
+        - fix
+        - bugfix
     - title: 🚀 Breaking Changes
       labels:
         - breaking-change
