@@ -38,3 +38,5 @@ export const uniqueArray = (keys: string[])=>{
     const array = keys.filter((key, idx, ar)=> ar.indexOf(key)=== idx)
     return array
 }
+
+// new constant
