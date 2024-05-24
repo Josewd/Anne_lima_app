@@ -6,6 +6,9 @@ on:
       version:
         description: 'Version number to be released (must follow semantic versioning)'
         required: true
+      betajs_tag:
+        description: 'Tag of the BetaJS release to fetch notes from'
+        required: false
 
 jobs:
   release:
