@@ -144,7 +144,7 @@ jobs:
           echo "Fetching release notes for tag $TAG_NAME from $REPO_OWNER/$REPO_NAME"
 
           TARGET_RELEASE_NOTES=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-            "https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v${{$BETAJSTAG}}" | \
+            "https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v${{ github.event.inputs.betajs_tag }}" | \
             jq -r .body)
           
           if [ "$TARGET_RELEASE_NOTES" == "null" ]; then
