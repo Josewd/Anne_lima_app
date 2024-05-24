@@ -76,7 +76,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           base: master
-          head: version-bump-${{steps.validate_version.outputs.version}}
+          head: version-bump-${{ env.version }}
           title: ${{ env.title }}
           body: ${{ env.title }}
           labels: enhancement, bug
