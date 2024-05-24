@@ -144,7 +144,7 @@ jobs:
             ## BetaJS Changes
             ${{ env.betajs_notes }}  
             EOF
-            )
+          )
           echo "release_body=$NOTES" >> $GITHUB_ENV
 
 
