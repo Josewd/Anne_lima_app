@@ -48,6 +48,8 @@ jobs:
       - name: Update package.json
         run: |
           VERSION=${{ env.version }}
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
           if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
             BETAJSTAG=${{ github.event.inputs.betajs_tag }}
             jq --arg version "$VERSION" --arg betajs "github:betajs/betajs-media-components#v$BETAJSTAG" '.version = $version | .dependencies["betajs-media-components"] = $betajs' package.json > tmp.$$.json && mv tmp.$$.json package.json
@@ -57,8 +59,6 @@ jobs:
             git commit -am "Bump version to v$VERSION"
           fi
           npm install
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
           git checkout -b version-bump-$VERSION
           git push origin version-bump-$VERSION
 
