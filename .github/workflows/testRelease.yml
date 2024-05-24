@@ -33,7 +33,7 @@ jobs:
             echo "Error: Tag v$VERSION already exists"
             exit 1
           fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT"
+          echo "version=$VERSION >> $GITHUB_OUTPUT"
 
       - name: Fetch BetaJS Release Notes
         if: ${{ github.event.inputs.betajs_tag }}
