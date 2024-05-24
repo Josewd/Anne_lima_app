@@ -133,9 +133,6 @@ jobs:
             https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
             | jq -r '.body')
           echo "$NOTES > betajs-release-notes.txt"
-
-      - name: Combine Release Notes
-        run: |
           echo "${{ steps.notes.outputs.notes }}" >> combined-release-notes.md
           echo "\n\n## BetaJS Changes\n" >> combined-release-notes.md
           cat betajs-release-notes.txt >> combined-release-notes.md
