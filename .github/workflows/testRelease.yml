@@ -35,15 +35,15 @@ jobs:
           fi
           echo "version=$VERSION" >> $GITHUB_ENV
 
-      - name: Fetch BetaJS Release Notes
-        if: ${{ github.event.inputs.betajs_tag }}
-        id: fetch_betajs_notes
-        run: |
-          BETAJSTAG=${{ github.event.inputs.betajs_tag }}
-          NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
-            | jq -r '.body')
-          echo "betajs_notes=$NOTES >> $GITHUB_ENV"
+      # - name: Fetch BetaJS Release Notes
+      #   if: ${{ github.event.inputs.betajs_tag }}
+      #   id: fetch_betajs_notes
+      #   run: |
+      #     BETAJSTAG=${{ github.event.inputs.betajs_tag }}
+      #     NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+      #       https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
+      #       | jq -r '.body')
+      #     echo "betajs_notes=$NOTES >> $GITHUB_ENV"
 
       - name: Update package.json
         run: |
@@ -129,6 +129,45 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: master
 
+      
+      - name: Get Target Release Notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BETAJSTAG=${{ github.event.inputs.betajs_tag }}
+          
+          echo "Fetching release notes for tag $TAG_NAME from $REPO_OWNER/$REPO_NAME"
+
+          TARGET_RELEASE_NOTES=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG" | \
+            jq -r .body)
+          
+          if [ "$TARGET_RELEASE_NOTES" == "null" ]; then
+            echo "Release notes not found for tag $BETAJSTAG"
+            exit 1
+          fi
+
+          echo "$TARGET_RELEASE_NOTES" > target-release-notes.txt
+
+      - name: Combine Release Notes
+        run: |
+          echo "## Combined Release Notes" > combined-release-notes.md
+          echo "${{ steps.notes.outputs.notes }}" >> combined-release-notes.md
+          echo "" >> combined-release-notes.md
+          echo "\n\n## BetaJS Changes\n" >> combined-release-notes.md
+          cat target-release-notes.txt >> combined-release-notes.md
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASE_TITLE="Release $TAG_NAME"
+          RELEASE_BODY=$(cat combined-release-notes.md)
+
+          curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+            -d "{\"tag_name\":\"$TAG_NAME\",\"name\":\"$RELEASE_TITLE\",\"body\":\"$RELEASE_BODY\"}" \
+            https://api.github.com/repos/${{ github.repository }}/releases
+
       # - name: Build Release Body
       #   id: build_release_body
       #   run: |
@@ -140,17 +179,17 @@ jobs:
       #     echo "release_body=$NOTES" >> $GITHUB_ENV
 
 
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-        with:
-          tag_name: v${{ env.version }}
-          release_name: v${{ env.version }}
-          body: |
-            - ${{ steps.notes.outputs.release-notes }}
-            - \n\n## BetaJS Changes\n
-            - ${{ steps.fetch_betajs_notes.outputs.betajs_notes }}
-          draft: false
-          prerelease: false
+      # - name: Create GitHub Release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      #   with:
+      #     tag_name: v${{ env.version }}
+      #     release_name: v${{ env.version }}
+      #     body: |
+      #       - ${{ steps.notes.outputs.release-notes }}
+      #       - \n\n## BetaJS Changes\n
+      #       - ${{ steps.fetch_betajs_notes.outputs.betajs_notes }}
+      #     draft: false
+      #     prerelease: false
 
