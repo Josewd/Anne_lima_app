@@ -62,23 +62,23 @@ jobs:
           git commit -am "Bump version to v$VERSION and betajs-media-components version to v$BETAJSTAG"
           git push origin version-bump-$VERSION
 
-      - name: Compose PR Title
-        id: compose_pr_title
-        run: |
-          TITLE="Bump version to ${{ steps.validate_version.outputs.version }}"
-          if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
-            BETAJSTAG="${{ github.event.inputs.betajs_tag }}"
-            BETAJSPATH="${{ steps.fetch_betajs_notes.outputs.betajs_notes }}"
-            TITLE="$TITLE and BetaJS to ${{ github.event.inputs.betajs_tag }}"
-          fi
-          echo "title=$TITLE >> $GITHUB_OUTPUT"
+      # - name: Compose PR Title
+      #   id: compose_pr_title
+      #   run: |
+      #     TITLE="Bump version to ${{ steps.validate_version.outputs.version }}"
+      #     if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
+      #       BETAJSTAG="${{ github.event.inputs.betajs_tag }}"
+      #       BETAJSPATH="${{ steps.fetch_betajs_notes.outputs.betajs_notes }}"
+      #       TITLE="$TITLE and BetaJS to ${{ github.event.inputs.betajs_tag }}"
+      #     fi
+      #     echo "title=$TITLE >> $GITHUB_OUTPUT"
 
       - name: Create pull request
         uses: devops-infra/action-pull-request@v0.5.5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: master
-          title: ${{ steps.compose_pr_title.outputs.title }}
+          title: Bump version to ${{ steps.validate_version.outputs.version }}
           assignee: ${{ github.actor }}
           reviewer: josewd
           label: enhancement, feature
