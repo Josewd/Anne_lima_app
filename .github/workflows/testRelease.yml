@@ -33,25 +33,50 @@ jobs:
             echo "Error: Tag v$VERSION already exists"
             exit 1
           fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_ENV
+
+      - name: Fetch BetaJS Release Notes
+        if: ${{ github.event.inputs.betajs_tag }}
+        id: fetch_betajs_notes
+        run: |
+          BETAJSTAG=${{ github.event.inputs.betajs_tag }}
+          NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
+            | jq -r '.body')
+          echo "betajs_notes=$NOTES" >> $GITHUB_ENV
 
       - name: Update package.json
         run: |
-          VERSION=${{ steps.validate_version.outputs.version }}
-          jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
+          VERSION=${{ env.version }}
+          if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
+            BETAJSTAG=${{ github.event.inputs.betajs_tag }}
+            jq --arg version "$VERSION" --arg betajs "github:betajs/betajs-media-components#v$BETAJSTAG" '.version = $version | .dependencies["betajs-media-components"] = $betajs' package.json > tmp.$$.json && mv tmp.$$.json package.json
+            git commit -am "Bump version to v$VERSION and betajs-media-components version to v$BETAJSTAG"
+          else
+            jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
+            git commit -am "Bump version to v$VERSION"
+          fi
           npm install
-          git config --global user.email "exageradonome@gmail.com"
-          git config --global user.name "josewd"
+          git config --global user.email "${{ github.event.sender.email }}"
+          git config --global user.name "${{ github.event.sender.login }}"
           git checkout -b version-bump-$VERSION
-          git commit -am "Bump version to v$VERSION"
           git push origin version-bump-$VERSION
+
+      - name: Compose PR Title
+        id: compose_pr_title
+        run: |
+          TITLE="Bump version to ${{ env.version }}"
+          if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
+            TITLE="$TITLE and BetaJS to ${{ github.event.inputs.betajs_tag }}"
+          fi
+          echo "title=$TITLE" >> $GITHUB_ENV
 
       - name: Create pull request
         uses: devops-infra/action-pull-request@v0.5.5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: master
-          title: Bump version to ${{ steps.validate_version.outputs.version }}
+          title: ${{ env.title }}
           assignee: ${{ github.actor }}
           reviewer: josewd
           label: enhancement, feature
@@ -67,13 +92,12 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              head: `version-bump-${{ steps.validate_version.outputs.version }}`,
+              head: `version-bump-${{ env.version }}`,
             });
-      
             if (prs.data.length === 0) {
-              throw new Error(`Pull request for branch version-bump-${{ steps.validate_version.outputs.version }} not found`);
+              throw new Error(`Pull request for branch version-bump-${{ env.version }} not found`);
             }
-            const prNumber = prs.data[0]?.number;
+            const prNumber = prs.data[0].number;
             let isMerged = false;
             while (!isMerged) {
               const { data: pr } = await github.pulls.get({
@@ -81,7 +105,6 @@ jobs:
                 repo: context.repo.repo,
                 pull_number: prNumber,
               });
-      
               if (pr.merged) {
                 isMerged = true;
               } else {
@@ -90,9 +113,10 @@ jobs:
               }
             }
             return { prNumber };
+
       - name: Create Tag
         run: |
-          VERSION=${{ steps.validate_version.outputs.version }}
+          VERSION=${{ env.version }}
           git fetch --tags
           git tag v$VERSION
           git push origin v$VERSION
@@ -101,38 +125,27 @@ jobs:
         id: notes
         uses: RedCrafter07/release-notes-action@v1.0.0
         with:
-          tag-name: v${{ steps.validate_version.outputs.version }}
+          tag-name: v${{ env.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: master
-
-      - name: Fetch BetaJS Release Notes
-        if: ${{ github.event.inputs.betajs_tag }}
-        id: fetch_betajs_notes
-        run: |
-          BETAJSTAG=${{ github.event.inputs.betajs_tag }}
-          NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
-            | jq -r '.body')
-          echo "betajs_notes=$NOTES >> $GITHUB_OUTPUT"
 
       - name: Build Release Body
         id: build_release_body
         run: |
           NOTES="${{ steps.notes.outputs.release-notes }}"
           if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
-            BETAJSTAG="${{ github.event.inputs.betajs_tag }}"
-            BETAJSPATH="${{ steps.fetch_betajs_notes.outputs.betajs_notes }}"
-            NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSPATH"
+            BETAJSNOTES="${{ env.betajs_notes }}"
+            NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
           fi
-          echo "release_body=$NOTES >> $GITHUB_OUTPUT"
-          
+          echo "release_body=$NOTES" >> $GITHUB_ENV
+
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
-          tag_name: v${{ steps.validate_version.outputs.version }}
-          release_name: v${{ steps.validate_version.outputs.version }}
-          body: ${{ steps.build_release_body.outputs.release_body }}
+          tag_name: v${{ env.version }}
+          release_name: v${{ env.version }}
+          body: ${{ env.release_body }}
           draft: false
           prerelease: false
