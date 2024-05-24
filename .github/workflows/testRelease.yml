@@ -48,20 +48,37 @@ jobs:
       - name: Update package.json
         run: |
           VERSION=${{ steps.validate_version.outputs.version }}
+          if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
+            BETAJSTAG=${{ github.event.inputs.betajs_tag }}
+            jq --arg version "$VERSION" --arg betajs "github:betajs/betajs-media-components#v$BETAJSTAG" '.version = $version | .dependencies["betajs-media-components"] = $betajs' package.json > tmp.$$.json && mv tmp.$$.json package.json
+          else
+            jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
+          fi
           jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
           npm install
-          git config --global user.email "exageradonome@gmail.com"
-          git config --global user.name "josewd"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
           git checkout -b version-bump-$VERSION
-          git commit -am "Bump version to v$VERSION"
+          git commit -am "Bump version to v$VERSION and betajs-media-components version to v$BETAJSTAG"
           git push origin version-bump-$VERSION
+
+      - name: Compose PR Title
+        id: compose_pr_title
+        run: |
+          TITLE="Bump version to ${{ steps.validate_version.outputs.version }}"
+          if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
+            BETAJSTAG="${{ github.event.inputs.betajs_tag }}"
+            BETAJSPATH="${{ steps.fetch_betajs_notes.outputs.betajs_notes }}"
+            TITLE="$TITLE and BetaJS to ${{ github.event.inputs.betajs_tag }}"
+          fi
+          echo "pr_title=$TITLE >> $GITHUB_OUTPUT"
 
       - name: Create pull request
         uses: devops-infra/action-pull-request@v0.5.5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: master
-          title: Bump version to ${{ steps.validate_version.outputs.version }}
+          title: ${{ steps.compose_pr_title.outputs.pr_title }}
           assignee: ${{ github.actor }}
           reviewer: josewd
           label: enhancement, feature
