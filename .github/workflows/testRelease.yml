@@ -48,12 +48,17 @@ jobs:
       - name: Update package.json
         run: |
           VERSION=${{ env.version }}
-          jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
+          if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
+            BETAJSTAG=${{ github.event.inputs.betajs_tag }}
+            jq --arg version "$VERSION" --arg betajs "github:betajs/betajs-media-components#v$BETAJSTAG" '.version = $version | .dependencies["betajs-media-components"] = $betajs' package.json > tmp.$$.json && mv tmp.$$.json package.json
+          else
+            jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
+          fi
           npm install
           git config --global user.email "${{ github.event.sender.email }}"
           git config --global user.name "${{ github.event.sender.login }}"
           git checkout -b version-bump-$VERSION
-          git commit -am "Bump version to v$VERSION"
+          git commit -am "Bump version to v$VERSION and betajs-media-components version to v${{github.event.inputs.betajs_tag}}"
           git push origin version-bump-$VERSION
 
       - name: Create pull request
