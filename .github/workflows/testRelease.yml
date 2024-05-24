@@ -67,8 +67,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: master
           title: ${{ github.event.commits[0].message }}
-          assignee: ${{ github.event.sender.login }}
-          reviewer: josewd
           label: enhancement, feature
           get_diff: true
           allow_no_diff: false
