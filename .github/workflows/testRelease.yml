@@ -50,8 +50,8 @@ jobs:
           VERSION=${{ env.version }}
           jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
           npm install
-          git config --global user.email "exageradonome@gmail.com"
-          git config --global user.name "josewd"
+          git config --global user.email "${{ github.event.sender.email }}"
+          git config --global user.name "${{ github.event.sender.login }}"
           git checkout -b version-bump-$VERSION
           git commit -am "Bump version to v$VERSION"
           git push origin version-bump-$VERSION
@@ -62,7 +62,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: master
           title: ${{ github.event.commits[0].message }}
-          assignee: ${{ github.actor }}
+          assignee: ${{ github.event.sender.login }}
           reviewer: josewd
           label: enhancement, feature
           get_diff: true
