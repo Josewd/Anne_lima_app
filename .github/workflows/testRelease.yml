@@ -146,7 +146,7 @@ jobs:
         with:
           tag_name: v${{ env.version }}
           release_name: v${{ env.version }}
-          body: ${{ steps.notes.outputs.release-notes }}"\n\n## BetaJS Changes\n"${{ env.betajs_notes }}
+          body: ${{ steps.notes.outputs.release-notes }} "\n\n## BetaJS Changes\n" ${{ env.betajs_notes }}
           draft: false
           prerelease: false
 
