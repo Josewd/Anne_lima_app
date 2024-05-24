@@ -20,16 +20,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
-      - name: Fetch BetaJS Release Notes
-        if: ${{ github.event.inputs.betajs_tag }}
-        id: fetch_betajs_notes
-        run: |
-          BETAJSTAG=${{ github.event.inputs.betajs_tag }}
-          NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
-            | jq -r '.body')
-          echo "betajs_notes=$NOTES >> $GITHUB_OUTPUT"
 
       - name: Validate version
         id: validate_version
@@ -119,6 +109,16 @@ jobs:
           tag-name: v${{ steps.validate_version.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: master
+
+      - name: Fetch BetaJS Release Notes
+        if: ${{ github.event.inputs.betajs_tag }}
+        id: fetch_betajs_notes
+        run: |
+          BETAJSTAG=${{ github.event.inputs.betajs_tag }}
+          NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
+            | jq -r '.body')
+          echo "betajs_notes=$NOTES >> $GITHUB_OUTPUT"
 
       - name: Build Release Body
         id: build_release_body
