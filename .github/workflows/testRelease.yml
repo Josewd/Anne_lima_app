@@ -132,7 +132,7 @@ jobs:
           NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
             | jq -r '.body')
-          echo "betajs_notes=$NOTES >> $GITHUB_OUTPUT"
+          echo "betajs_notes=$NOTES >> $GITHUB_ENV"
 
       - name: Build Release Body
         id: build_release_body
@@ -140,8 +140,12 @@ jobs:
           NOTES="${{ steps.notes.outputs.release-notes }}"
           BETAJSNOTES="${{ steps.fetch_betajs_notes.outputs.betajs_notes }}"
           echo $BETAJSNOTES
-          NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
-          echo "release_body=$NOTES" >> $GITHUB_OUTPUT
+          NOTES=$(cat <<EOF
+            ## BetaJS Changes
+            ${{ env.betajs_notes }}  
+            EOF
+            )
+          echo "release_body=$NOTES" >> $GITHUB_ENV
 
 
       - name: Create GitHub Release
@@ -151,7 +155,7 @@ jobs:
         with:
           tag_name: v${{ env.version }}
           release_name: v${{ env.version }}
-          body: ${{ steps.build_release_body.outputs.release_body }}
+          body: ${{ env.release_body }}
           draft: false
           prerelease: false
 
