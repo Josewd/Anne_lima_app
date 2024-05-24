@@ -4,7 +4,7 @@ changelog:
       - skip-changelog
   categories:
    - title: 📺 Video Player
-      labels:
+     labels:
         - player
     - title: 🚀 Features
       labels:
