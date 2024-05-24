@@ -49,6 +49,9 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: master
           title: Bump version to ${{ steps.validate_version.outputs.version }}
+          assignee: ${{ github.actor }}
+          reviewer: josewd
+          label: enhancement, feature
           get_diff: true
           allow_no_diff: false
 
