@@ -20,6 +20,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        
+      - name: Fetch BetaJS Release Notes
+        if: ${{ github.event.inputs.betajs_tag }}
+        id: fetch_betajs_notes
+        run: |
+          BETAJSTAG=${{ github.event.inputs.betajs_tag }}
+          NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
+            | jq -r '.body')
+          echo "betajs_notes=$NOTES >> $GITHUB_OUTPUT"
 
       - name: Validate version
         id: validate_version
@@ -34,16 +44,6 @@ jobs:
             exit 1
           fi
           echo "version=$VERSION" >> $GITHUB_ENV
-
-      - name: Fetch BetaJS Release Notes
-        if: ${{ github.event.inputs.betajs_tag }}
-        id: fetch_betajs_notes
-        run: |
-          BETAJSTAG=${{ github.event.inputs.betajs_tag }}
-          NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
-            | jq -r '.body')
-          echo "betajs_notes=$NOTES >> $GITHUB_OUTPUT"
 
       - name: Update package.json
         run: |
@@ -67,6 +67,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: master
           title: Bump version to ${{ steps.validate_version.outputs.version }}
+          assignee: ${{ github.actor }}
+          reviewer: josewd
           label: enhancement, feature
           get_diff: true
           allow_no_diff: false
