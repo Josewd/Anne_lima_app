@@ -50,14 +50,14 @@ jobs:
           VERSION=${{ env.version }}
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-          if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
-            BETAJSTAG=${{ github.event.inputs.betajs_tag }}
-            jq --arg version "$VERSION" --arg betajs "github:betajs/betajs-media-components#v$BETAJSTAG" '.version = $version | .dependencies["betajs-media-components"] = $betajs' package.json > tmp.$$.json && mv tmp.$$.json package.json
-            git commit -am "Bump version to v$VERSION and betajs-media-components version to v$BETAJSTAG"
-          else
-            jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
-            git commit -am "Bump version to v$VERSION"
-          fi
+          # if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
+          #   BETAJSTAG=${{ github.event.inputs.betajs_tag }}
+          #   jq --arg version "$VERSION" --arg betajs "github:betajs/betajs-media-components#v$BETAJSTAG" '.version = $version | .dependencies["betajs-media-components"] = $betajs' package.json > tmp.$$.json && mv tmp.$$.json package.json
+          #   git commit -am "Bump version to v$VERSION and betajs-media-components version to v$BETAJSTAG"
+          # else
+          jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
+          git commit -am "Bump version to v$VERSION"
+          # fi
           npm install
           git checkout -b version-bump-$VERSION
           git push origin version-bump-$VERSION
@@ -72,16 +72,16 @@ jobs:
           echo "title=$TITLE" >> $GITHUB_ENV
 
       - name: Create pull request
-        uses: devops-infra/action-pull-request@v0.5.5
+        uses: chipinside/create-pull-request@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          target_branch: master
+          base: master
+          head: version-bump-${{steps.validate_version.outputs.version}}
           title: ${{ env.title }}
-          assignee: ${{ github.actor }}
-          reviewer: josewd
-          label: enhancement, feature
-          get_diff: true
-          allow_no_diff: false
+          body: ${{ env.title }}
+          labels: enhancement, bug
+          assignees: ${{ github.actor }}
+          reviewers: Josewd
 
       - name: Wait for PR to be merged
         id: wait_for_merge
@@ -149,3 +149,4 @@ jobs:
           body: ${{ env.release_body }}
           draft: false
           prerelease: false
+
