@@ -129,16 +129,16 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: master
 
-      - name: Build Release Body
-        id: build_release_body
-        run: |
-          NOTES="${{ steps.notes.outputs.release-notes }}"
-          if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
-            BETAJSNOTES="${{ env.betajs_notes }}"
-             echo "release_body=$NOTES + '\n\n## BetaJS Changes\n' + $BETAJSNOTES" >> $GITHUB_ENV
-          else 
-            echo "release_body=$NOTES >> $GITHUB_ENV
-          fi
+      # - name: Build Release Body
+      #   id: build_release_body
+      #   run: |
+      #     NOTES="${{ steps.notes.outputs.release-notes }}"
+      #     if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
+      #       BETAJSNOTES="${{ steps.fetch_betajs_notes.outputs.betajs_notes }}"
+      #       NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
+      #     fi
+      #     echo "release_body=$NOTES" >> $GITHUB_ENV
+
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
@@ -147,7 +147,10 @@ jobs:
         with:
           tag_name: v${{ env.version }}
           release_name: v${{ env.version }}
-          body: ${{ env.release_body }}
+          body: |
+            ${{ steps.notes.outputs.release-notes }}
+            \n\n## BetaJS Changes\n
+            ${{ steps.fetch_betajs_notes.outputs.betajs_notes }}
           draft: false
           prerelease: false
 
