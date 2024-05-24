@@ -133,8 +133,7 @@ jobs:
           NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
             | jq -r '.body')
-          echo "\n\n## BetaJS Changes\n" >> combined-release-notes.md
-          echo "$NOTES >> combined-release-notes.md"
+          echo "betajs_notes=$NOTES >> $GITHUB_OUTPUT"
 
       # - name: Create GitHub Release
       #   env:
@@ -147,15 +146,14 @@ jobs:
       #       -d "{\"tag_name\":\"$TAG_NAME\",\"name\":\"$RELEASE_TITLE\",\"body\":\"$RELEASE_BODY\"}" \
       #       https://api.github.com/repos/${{ github.repository }}/releases
 
-      # - name: Build Release Body
-      #   id: build_release_body
-      #   run: |
-      #     NOTES="${{ steps.notes.outputs.release-notes }}"
-      #     if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
-      #       BETAJSNOTES="${{ steps.fetch_betajs_notes.outputs.betajs_notes }}"
-      #       NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
-      #     fi
-      #     echo "release_body=$NOTES" >> $GITHUB_ENV
+      - name: Build Release Body
+        id: build_release_body
+        run: |
+          NOTES="${{ steps.notes.outputs.release-notes }}"
+          BETAJSNOTES="${{ steps.fetch_betajs_notes.outputs.betajs_notes }}"
+          echo $BETAJSNOTES
+          NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
+          echo "release_body=$NOTES" >> $GITHUB_ENV
 
 
       - name: Create GitHub Release
@@ -165,7 +163,7 @@ jobs:
         with:
           tag_name: v${{ env.version }}
           release_name: v${{ env.version }}
-          body: combined-release-notes.md
+          body: ${{ env.release_body }}
           draft: false
           prerelease: false
 
