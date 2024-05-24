@@ -134,10 +134,11 @@ jobs:
         run: |
           NOTES="${{ steps.notes.outputs.release-notes }}"
           if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
-            BETAJSNOTES="${{ steps.fetch_betajs_notes.outputs.betajs_notes }}"
-            NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
+            BETAJSNOTES="${{ env.betajs_notes }}"
+             echo "release_body=${{"$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"}}" >> $GITHUB_ENV
+          else 
+            echo "release_body=$NOTES >> $GITHUB_ENV
           fi
-          echo "release_body=$NOTES" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
