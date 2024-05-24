@@ -32,6 +32,15 @@ jobs:
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+      - name: Fetch BetaJS Release Notes
+        id: fetch_betajs_notes
+        run: |
+          BETAJSTAG=${{ github.event.inputs.betajs_tag }}
+          NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
+            | jq -r '.body')
+          echo "betajs_notes=$NOTES >> $GITHUB_OUTPUT"
+
       - name: Update package.json
         run: |
           VERSION=${{ steps.validate_version.outputs.version }}
@@ -109,6 +118,6 @@ jobs:
         with:
           tag_name: v${{ steps.validate_version.outputs.version }}
           release_name: v${{ steps.validate_version.outputs.version }}
-          body: ${{ steps.notes.outputs.release-notes }}
+          body: ${{ steps.notes.outputs.release-notes }}"\n\n## BetaJS Changes\n"${{ steps.fetch_betajs_notes.outputs.betajs_notes }}
           draft: false
           prerelease: false
