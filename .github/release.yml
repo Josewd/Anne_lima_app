@@ -3,8 +3,8 @@ changelog:
     labels:
       - skip-changelog
   categories:
-   - title: 📺 Video Player
-     labels:
+    - title: 📺 Video Player
+      labels:
         - player
     - title: 🚀 Features
       labels:
@@ -17,4 +17,4 @@ changelog:
         - breaking-change
     - title: Other Changes
       labels:
-        - "*" # Catch-all for pull requests that didn't match any of the previous 
+        - "*" 
