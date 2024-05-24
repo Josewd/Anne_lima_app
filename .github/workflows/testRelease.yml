@@ -33,7 +33,7 @@ jobs:
             echo "Error: Tag v$VERSION already exists"
             exit 1
           fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT"
 
       - name: Fetch BetaJS Release Notes
         if: ${{ github.event.inputs.betajs_tag }}
@@ -71,14 +71,14 @@ jobs:
             BETAJSPATH="${{ steps.fetch_betajs_notes.outputs.betajs_notes }}"
             TITLE="$TITLE and BetaJS to ${{ github.event.inputs.betajs_tag }}"
           fi
-          echo "pr_title=$TITLE >> $GITHUB_OUTPUT"
+          echo "title=$TITLE >> $GITHUB_OUTPUT"
 
       - name: Create pull request
         uses: devops-infra/action-pull-request@v0.5.5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: master
-          title: ${{ steps.compose_pr_title.outputs.pr_title }}
+          title: ${{ steps.compose_pr_title.outputs.title }}
           assignee: ${{ github.actor }}
           reviewer: josewd
           label: enhancement, feature
