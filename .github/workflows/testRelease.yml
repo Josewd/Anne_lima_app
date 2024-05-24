@@ -33,7 +33,7 @@ jobs:
             echo "Error: Tag v$VERSION already exists"
             exit 1
           fi
-          echo "version=$VERSION >> $GITHUB_OUTPUT"
+          echo "version=$VERSION" >> $GITHUB_ENV
 
       - name: Fetch BetaJS Release Notes
         if: ${{ github.event.inputs.betajs_tag }}
@@ -47,7 +47,7 @@ jobs:
 
       - name: Update package.json
         run: |
-          VERSION=${{ steps.validate_version.outputs.version }}
+          VERSION=${{ env.version }}
           if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
             BETAJSTAG=${{ github.event.inputs.betajs_tag }}
             jq --arg version "$VERSION" --arg betajs "github:betajs/betajs-media-components#v$BETAJSTAG" '.version = $version | .dependencies["betajs-media-components"] = $betajs' package.json > tmp.$$.json && mv tmp.$$.json package.json
