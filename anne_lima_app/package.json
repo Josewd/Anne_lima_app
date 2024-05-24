@@ -1,6 +1,6 @@
 {
   "name": "anne_lima_app",
-  "version": "4.2.2",
+  "version": "4.2.3",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
