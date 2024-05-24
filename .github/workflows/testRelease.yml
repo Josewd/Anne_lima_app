@@ -138,15 +138,10 @@ jobs:
         id: build_release_body
         run: |
           NOTES="${{ steps.notes.outputs.release-notes }}"
-          BETAJSNOTES="${{ steps.fetch_betajs_notes.outputs.betajs_notes }}"
+          BETAJSNOTES="${{ env.betajs_notes }}"
           echo $BETAJSNOTES
-          NOTES=$(cat <<EOF
-            ## BetaJS Changes
-            ${{ env.betajs_notes }}  
-            EOF
-          )
+          NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
           echo "release_body=$NOTES" >> $GITHUB_ENV
-
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
