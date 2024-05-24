@@ -46,7 +46,7 @@ jobs:
       #   run: |
       #     BETAJSTAG=${{ github.event.inputs.betajs_tag }}
       #     NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
-      #       https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
+      #       https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v${{BETAJSTAG}} \
       #       | jq -r '.body')
       #     echo "betajs_notes=$NOTES >> $GITHUB_ENV"
 
@@ -144,7 +144,7 @@ jobs:
           echo "Fetching release notes for tag $TAG_NAME from $REPO_OWNER/$REPO_NAME"
 
           TARGET_RELEASE_NOTES=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-            "https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG" | \
+            "https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v${{$BETAJSTAG}}" | \
             jq -r .body)
           
           if [ "$TARGET_RELEASE_NOTES" == "null" ]; then
