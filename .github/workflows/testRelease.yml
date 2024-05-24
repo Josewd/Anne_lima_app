@@ -43,7 +43,7 @@ jobs:
           NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
             | jq -r '.body')
-          echo "betajs_notes=$NOTES >> $GITHUB_ENV"
+          echo "betajs_notes=$NOTES >> $GITHUB_OUTPUT"
 
       - name: Update package.json
         run: |
@@ -134,7 +134,7 @@ jobs:
         run: |
           NOTES="${{ steps.notes.outputs.release-notes }}"
           if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
-            BETAJSNOTES="${{ env.betajs_notes }}"
+            BETAJSNOTES="${{ steps.fetch_betajs_notes.outputs.betajs_notes }}"
             NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
           fi
           echo "release_body=$NOTES" >> $GITHUB_ENV
