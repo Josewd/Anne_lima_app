@@ -135,7 +135,8 @@ jobs:
             | jq -r '.body')
           EOF
           )
-          echo "betajs_notes=$NOTES" >> $GITHUB_ENV
+          NOTES_JSON=$(jq -Rn --arg str "$NOTES" '$str | @json')
+          echo "betajs_notes=$NOTES_JSON" >> $GITHUB_ENV
 
       # - name: Build Release Body
       #   id: build_release_body
