@@ -149,7 +149,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: v${{ env.version }}
           name: v${{ env.version }}
-          body: >
+          body: |
+            ${{ env.betajs_notes }}
             ${{ steps.notes.outputs.release-notes }} 
             \n\n## BetaJS Changes\n
             ${{ env.betajs_notes }}
