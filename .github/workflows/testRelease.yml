@@ -142,11 +142,10 @@ jobs:
         run: |
           NOTES="${{ steps.notes.outputs.release-notes }}"
           if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
-            BETAJS_NOTES=${{ env.NOTES }}
             {
              echo 'release_body<<EOF'
              echo "$NOTES"
-             echo -e "\n\n## BetaJS Changes\n$BETAJSNOTES"
+             echo -e "\n\n## BetaJS Changes\n${{ env.NOTES }}"
              echo EOF
             } >> "$GITHUB_ENV"
           else
