@@ -54,6 +54,7 @@ jobs:
             git commit -am "Bump version to v$VERSION"
           fi
           npm install
+          git commit -am "Update package-lock.json"
           git checkout -b version-bump-$VERSION
           git push origin version-bump-$VERSION
 
