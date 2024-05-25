@@ -144,13 +144,24 @@ jobs:
       #     echo "release_body=$NOTES" >> $GITHUB_ENV
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        uses: iamkubi/github-release@2.0
         with:
-          tag_name: v${{ env.version }}
-          release_name: v${{ env.version }}
-          body: ${{ steps.notes.outputs.release-notes }} {{ env.betajs_notes }}
-          draft: false
-          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: v${{ env.version }}
+          name: v${{ env.version }}
+          body: >
+            ${{ steps.notes.outputs.release-notes }} 
+            \n\n## BetaJS Changes\n
+            ${{ env.betajs_notes }}
+
+      # - name: Create GitHub Release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      #   with:
+      #     tag_name: v${{ env.version }}
+      #     release_name: v${{ env.version }}
+      #     body: ${{ steps.notes.outputs.release-notes }} ${{ env.betajs_notes }}
+      #     draft: false
+      #     prerelease: false
 
