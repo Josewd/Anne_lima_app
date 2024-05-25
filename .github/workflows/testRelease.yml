@@ -129,11 +129,12 @@ jobs:
         id: fetch_betajs_notes
         run: |
           BETAJSTAG=${{ github.event.inputs.betajs_tag }} 
-          NOTES= << EOF
+          NOTES=$(cat <<EOF
             $(curl -s -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
             | jq -r '.body')
           EOF
+          )
           echo "betajs_notes=$NOTES" >> $GITHUB_ENV
 
       # - name: Build Release Body
