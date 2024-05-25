@@ -155,7 +155,7 @@ jobs:
           name: v${{ env.version }}
           body: >
             ${{ steps.notes.outputs.release-notes }}
-            $(jq -r <<< ${{ jq -r <<< env.betajs_notes }})
+            ${{ $(jq -r <<< env.betajs_notes) }}
 
       # - name: Create GitHub Release
       #   uses: actions/create-release@v1
