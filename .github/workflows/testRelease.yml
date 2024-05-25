@@ -128,7 +128,14 @@ jobs:
         if: ${{ github.event.inputs.betajs_tag }}
         id: fetch_betajs_notes
         run: |
-          BETAJSTAG=${{ github.event.inputs.betajs_tag }} 
+          BETAJSTAG=${{ github.event.inputs.betajs_tag }}
+          {
+            echo 'NOTES<<EOF'
+            curl -s -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
+            | jq -r '.body'
+            echo EOF
+          } >> "$GITHUB_ENV"
           NOTES=$(cat <<EOF
             $(curl -s -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
@@ -147,24 +154,24 @@ jobs:
       #     NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
       #     echo "release_body=$NOTES" >> $GITHUB_ENV
 
-      - name: Create GitHub Release
-        uses: iamkubi/github-release@2.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: v${{ env.version }}
-          name: v${{ env.version }}
-          body: >
-            ${{ steps.notes.outputs.release-notes }}
-            ${{ $(jq -r <<< env.betajs_notes) }}
-
       # - name: Create GitHub Release
-      #   uses: actions/create-release@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      #   uses: iamkubi/github-release@2.0
       #   with:
-      #     tag_name: v${{ env.version }}
-      #     release_name: v${{ env.version }}
-      #     body: ${{ steps.notes.outputs.release-notes }} ${{ env.betajs_notes }}
-      #     draft: false
-      #     prerelease: false
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     tag: v${{ env.version }}
+      #     name: v${{ env.version }}
+      #     body: |
+      #       ${{ steps.notes.outputs.release-notes }}
+      #       ${{ $(jq -r <<< env.betajs_notes) }}
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        with:
+          tag_name: v${{ env.version }}
+          release_name: v${{ env.version }}
+          body: ${{ steps.notes.outputs.release-notes }} "\n\n ## Betajs Changelog\n\n " ${{ env.NOTES }}
+          draft: false
+          prerelease: false
 
