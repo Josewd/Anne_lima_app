@@ -47,7 +47,7 @@ jobs:
           git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
           if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
             BETAJSTAG=${{ github.event.inputs.betajs_tag }}
-            jq --arg version "$VERSION" --arg betajs "github:betajs/betajs-media-components#v$BETAJSTAG" '.version = $version | .dependencies["betajs-media-components"] = $betajs' package.json > tmp.$$.json && mv tmp.$$.json package.json
+            jq --arg version "$VERSION" --arg betajs "$BETAJSTAG" '.version = $version | .dependencies["betajs-media-components"] = $betajs' package.json > tmp.$$.json && mv tmp.$$.json package.json
             git commit -am "Bump version to v$VERSION and betajs-media-components version to v$BETAJSTAG"
           else
             jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
