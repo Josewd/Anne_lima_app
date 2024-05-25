@@ -144,9 +144,9 @@ jobs:
           if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
             BETAJS_NOTES=${{ env.NOTES }}
             {
-              echo 'release_body<<EFO'
-              $NOTES \n\n## BetaJS Changes\n $BETAJSNOTES
-              echo EFO
+              echo 'release_body<<EOF'
+              $NOTES\n\n## BetaJS Changes\n$BETAJSNOTES
+              echo EOF
             } >> "$GITHUB_ENV"
           else
             echo "release_body=$NOTES" >> $GITHUB_ENV
