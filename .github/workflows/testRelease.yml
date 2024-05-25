@@ -129,12 +129,12 @@ jobs:
         id: fetch_betajs_notes
         run: |
           BETAJSTAG=${{ github.event.inputs.betajs_tag }} 
-          # NOTES=$(curl -s -H "Accept: application/vnd.github.v3+json" \
-          #   https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
-          #   | jq -r '.body')
-          echo "betajs_notes=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+          NOTES= << EOF
+            $(curl -s -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
-            | jq -r '.body') >> $GITHUB_ENV"
+            | jq -r '.body')
+          EOF
+          echo "betajs_notes=$NOTES" >> $GITHUB_ENV
 
       # - name: Build Release Body
       #   id: build_release_body
