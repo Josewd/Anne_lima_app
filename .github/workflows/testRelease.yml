@@ -157,7 +157,7 @@ jobs:
             ${{ env.betajs_notes }}
             ${{ steps.notes.outputs.release-notes }} 
             \n\n## BetaJS Changes\n
-            ${{ env.betajs_notes }}
+            $(echo env.betajs_notes | jq -r .)
 
       # - name: Create GitHub Release
       #   uses: actions/create-release@v1
