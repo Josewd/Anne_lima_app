@@ -75,7 +75,7 @@ jobs:
           head: version-bump-${{ env.version }}
           title: ${{ env.title }}
           body: ${{ env.title }}
-          labels: enhancement, bug
+          labels: bump-version
           assignees: ${{ github.actor }}
           reviewers: Josewd
 
@@ -101,6 +101,9 @@ jobs:
                 repo: context.repo.repo,
                 pull_number: prNumber,
               });
+              if (pr.state === 'closed') {
+                throw new Error(`Pull request #${prNumber} is closed`);
+              }
               if (pr.merged) {
                 isMerged = true;
               } else {
