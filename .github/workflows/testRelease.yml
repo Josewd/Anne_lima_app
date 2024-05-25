@@ -143,10 +143,14 @@ jobs:
           NOTES="${{ steps.notes.outputs.release-notes }}"
           if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
             BETAJS_NOTES=${{ env.NOTES }}
-            NOTES="${NOTES}\n\n## BetaJS Changes\n${BETAJS_NOTES}"
+            {
+              echo 'release_body<<EFO'
+              $NOTES \n\n## BetaJS Changes\n $BETAJSNOTES
+              echo EFO
+            } >> $GITHUB_ENV
+          else
+            echo "release_body=$NOTES" >> $GITHUB_ENV
           fi
-          NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
-          echo "release_body=$NOTES" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: iamkubi/github-release@2.0
