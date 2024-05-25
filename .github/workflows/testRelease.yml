@@ -147,7 +147,7 @@ jobs:
               echo 'release_body<<EFO'
               $NOTES \n\n## BetaJS Changes\n $BETAJSNOTES
               echo EFO
-            } >> $GITHUB_ENV
+            } >> "$GITHUB_ENV"
           else
             echo "release_body=$NOTES" >> $GITHUB_ENV
           fi
