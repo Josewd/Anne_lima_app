@@ -138,14 +138,14 @@ jobs:
           NOTES_JSON=$(jq -Rn --arg str "$NOTES" '$str | @json')
           echo "betajs_notes=$NOTES_JSON" >> $GITHUB_ENV
 
-      - name: Build Release Body
-        id: build_release_body
-        run: |
-          NOTES="${{ steps.notes.outputs.release-notes }}"
-          BETAJSNOTES="${{ env.betajs_notes }}"
-          BETAJS_NOTES=$(jq -r <<< "$BETAJS_NOTES")
-          NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
-          echo "release_body=$NOTES" >> $GITHUB_ENV
+      # - name: Build Release Body
+      #   id: build_release_body
+      #   run: |
+      #     NOTES="${{ steps.notes.outputs.release-notes }}"
+      #     BETAJSNOTES="${{ env.betajs_notes }}"
+      #     BETAJS_NOTES=$(jq -r <<< "$BETAJS_NOTES")
+      #     NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
+      #     echo "release_body=$NOTES" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: iamkubi/github-release@2.0
@@ -153,7 +153,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: v${{ env.version }}
           name: v${{ env.version }}
-          body: ${{ env.release_body }}
+          body: >
+            ${{ steps.notes.outputs.release-notes }}
+            $(jq -r <<< ${{ env.betajs_notes }})
 
       # - name: Create GitHub Release
       #   uses: actions/create-release@v1
