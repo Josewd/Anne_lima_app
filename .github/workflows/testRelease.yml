@@ -136,23 +136,17 @@ jobs:
             | jq -r '.body'
             echo EOF
           } >> "$GITHUB_ENV"
-          NOTES=$(cat <<EOF
-            $(curl -s -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/betajs/betajs-media-components/releases/tags/v$BETAJSTAG \
-            | jq -r '.body')
-          EOF
-          )
-          NOTES_JSON=$(jq -Rn --arg str "$NOTES" '$str | @json')
-          echo "betajs_notes=$NOTES_JSON" >> $GITHUB_ENV
 
-      # - name: Build Release Body
-      #   id: build_release_body
-      #   run: |
-      #     NOTES="${{ steps.notes.outputs.release-notes }}"
-      #     BETAJSNOTES="${{ env.betajs_notes }}"
-      #     BETAJS_NOTES=$(jq -r <<< "$BETAJS_NOTES")
-      #     NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
-      #     echo "release_body=$NOTES" >> $GITHUB_ENV
+      - name: Build Release Body
+        id: build_release_body
+        run: |
+          NOTES="${{ steps.notes.outputs.release-notes }}"
+          if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
+            BETAJS_NOTES=${{ env.NOTES }}
+            NOTES="${NOTES}\n\n## BetaJS Changes\n${BETAJS_NOTES}"
+          fi
+          NOTES="$NOTES\n\n## BetaJS Changes\n$BETAJSNOTES"
+          echo "release_body=$NOTES" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: iamkubi/github-release@2.0
@@ -160,10 +154,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: v${{ env.version }}
           name: v${{ env.version }}
-          body: |
-            ${{ steps.notes.outputs.release-notes }}
-            \n\n ## Betajs Changelog\n\n
-            ${{ env.NOTES }}
+          body: ${{ env.release_body }}
 
       # - name: Create GitHub Release
       #   uses: actions/create-release@v1
