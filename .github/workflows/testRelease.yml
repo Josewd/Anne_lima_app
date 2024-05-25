@@ -45,14 +45,14 @@ jobs:
           VERSION=${{ env.version }}
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-          # if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
-          #   BETAJSTAG=${{ github.event.inputs.betajs_tag }}
-          #   jq --arg version "$VERSION" --arg betajs "github:betajs/betajs-media-components#v$BETAJSTAG" '.version = $version | .dependencies["betajs-media-components"] = $betajs' package.json > tmp.$$.json && mv tmp.$$.json package.json
-          #   git commit -am "Bump version to v$VERSION and betajs-media-components version to v$BETAJSTAG"
-          # else
-          jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
-          git commit -am "Bump version to v$VERSION"
-          # fi
+          if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
+            BETAJSTAG=${{ github.event.inputs.betajs_tag }}
+            jq --arg version "$VERSION" --arg betajs "github:betajs/betajs-media-components#v$BETAJSTAG" '.version = $version | .dependencies["betajs-media-components"] = $betajs' package.json > tmp.$$.json && mv tmp.$$.json package.json
+            git commit -am "Bump version to v$VERSION and betajs-media-components version to v$BETAJSTAG"
+          else
+            jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
+            git commit -am "Bump version to v$VERSION"
+          fi
           npm install
           git checkout -b version-bump-$VERSION
           git push origin version-bump-$VERSION
@@ -153,21 +153,13 @@ jobs:
           fi
 
       - name: Create GitHub Release
-        uses: iamkubi/github-release@2.0
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: v${{ env.version }}
-          name: v${{ env.version }}
+          tag_name: v${{ env.version }}
+          release_name: v${{ env.version }}
           body: ${{ env.release_body }}
-
-      # - name: Create GitHub Release
-      #   uses: actions/create-release@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-      #   with:
-      #     tag_name: v${{ env.version }}
-      #     release_name: v${{ env.version }}
-      #     body: ${{ steps.notes.outputs.release-notes }} "\n\n ## Betajs Changelog\n\n " ${{ env.NOTES }}
-      #     draft: false
-      #     prerelease: false
+          draft: false
+          prerelease: false
 
