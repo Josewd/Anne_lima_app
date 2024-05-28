@@ -28,13 +28,14 @@ jobs:
 
       - name: Validate version
         id: validate_version
+        env:
+          VERSION: ${{ github.event.inputs.version }}
         run: |
-          VERSION=${{ github.event.inputs.version }}
           if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Error: Version number must follow semantic versioning (MAJOR.MINOR.PATCH)"
             exit 1
           fi
-          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+          if [ $(git tag -l "v$VERSION") ]; then
             echo "Error: Tag v$VERSION already exists"
             exit 1
           fi
@@ -43,82 +44,77 @@ jobs:
       - name: Update package.json
         run: |
           VERSION=${{ env.version }}
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-          if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
-            BETAJSTAG=${{ github.event.inputs.betajs_tag }}
-            jq --arg version "$VERSION" --arg betajs "$BETAJSTAG" '.version = $version | .dependencies["betajs-media-components"] = $betajs' package.json > tmp.$$.json && mv tmp.$$.json package.json
-            git commit -am "Bump version to v$VERSION and betajs-media-components version to v$BETAJSTAG"
-          else
-            jq --arg version "$VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
-            git commit -am "Bump version to v$VERSION"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          npm version $VERSION --no-git-tag-version
+          if [ -n "$BETAJSTAG" ]; then
+            npm install betajs-media-components@$BETAJSTAG
           fi
           npm install
-          git commit -am "Update package-lock.json"
-          git checkout -b version-bump-$VERSION
-          git push origin version-bump-$VERSION
+          git commit -am "Bump version to $VERSION"
+          git push origin HEAD
 
-      - name: Compose PR Title
-        id: compose_pr_title
-        run: |
-          TITLE="Bump version to ${{ env.version }}"
-          if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
-            TITLE="$TITLE and BetaJS to ${{ github.event.inputs.betajs_tag }}"
-          fi
-          echo "title=$TITLE" >> $GITHUB_ENV
+      # - name: Compose PR Title
+      #   id: compose_pr_title
+      #   run: |
+      #     TITLE="Bump version to ${{ env.version }}"
+      #     if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
+      #       TITLE="$TITLE and BetaJS to ${{ github.event.inputs.betajs_tag }}"
+      #     fi
+      #     echo "title=$TITLE" >> $GITHUB_ENV
 
-      - name: Create pull request
-        uses: chipinside/create-pull-request@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          base: master
-          head: version-bump-${{ env.version }}
-          title: ${{ env.title }}
-          body: ${{ env.title }}
-          labels: bump-version
-          assignees: ${{ github.actor }}
-          reviewers: Josewd
+      # - name: Create pull request
+      #   uses: chipinside/create-pull-request@master
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     base: master
+      #     head: version-bump-${{ env.version }}
+      #     title: ${{ env.title }}
+      #     body: ${{ env.title }}
+      #     labels: bump-version
+      #     assignees: ${{ github.actor }}
+      #     reviewers: Josewd
 
-      - name: Wait for PR to be merged
-        id: wait_for_merge
-        uses: actions/github-script@v4
-        with:
-          script: |
-            const prs = await github.pulls.list({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              head: `version-bump-${{ env.version }}`,
-            });
-            if (prs.data.length === 0) {
-              throw new Error(`Pull request for branch version-bump-${{ env.version }} not found`);
-            }
-            const prNumber = prs.data[0].number;
-            let isMerged = false;
-            while (!isMerged) {
-              const { data: pr } = await github.pulls.get({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: prNumber,
-              });
-              if (pr.state === 'closed') {
-                throw new Error(`Pull request #${prNumber} is closed`);
-              }
-              if (pr.merged) {
-                isMerged = true;
-              } else {
-                console.log(`PR #${prNumber} not merged yet. Waiting...`);
-                await new Promise(resolve => setTimeout(resolve, 30000)); // Espera 30 secs antes de verificar novamente
-              }
-            }
-            return { prNumber };
+      # - name: Wait for PR to be merged
+      #   id: wait_for_merge
+      #   uses: actions/github-script@v4
+      #   with:
+      #     script: |
+      #       const prs = await github.pulls.list({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         state: 'open',
+      #         head: `version-bump-${{ env.version }}`,
+      #       });
+      #       if (prs.data.length === 0) {
+      #         throw new Error(`Pull request for branch version-bump-${{ env.version }} not found`);
+      #       }
+      #       const prNumber = prs.data[0].number;
+      #       let isMerged = false;
+      #       while (!isMerged) {
+      #         const { data: pr } = await github.pulls.get({
+      #           owner: context.repo.owner,
+      #           repo: context.repo.repo,
+      #           pull_number: prNumber,
+      #         });
+      #         if (pr.state === 'closed') {
+      #           throw new Error(`Pull request #${prNumber} is closed`);
+      #         }
+      #         if (pr.merged) {
+      #           isMerged = true;
+      #         } else {
+      #           console.log(`PR #${prNumber} not merged yet. Waiting...`);
+      #           await new Promise(resolve => setTimeout(resolve, 30000)); // Espera 30 secs antes de verificar novamente
+      #         }
+      #       }
+      #       return { prNumber };
 
       - name: Create Tag
         run: |
           VERSION=${{ env.version }}
           git fetch --tags
           git tag v$VERSION
-          git push origin v$VERSION
+          git push origin tag v$VERSION
 
       - name: Generate Release Notes
         id: notes
