@@ -54,61 +54,6 @@ jobs:
           git commit -am "Bump version to $VERSION"
           git push origin HEAD
 
-      # - name: Compose PR Title
-      #   id: compose_pr_title
-      #   run: |
-      #     TITLE="Bump version to ${{ env.version }}"
-      #     if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
-      #       TITLE="$TITLE and BetaJS to ${{ github.event.inputs.betajs_tag }}"
-      #     fi
-      #     echo "title=$TITLE" >> $GITHUB_ENV
-
-      # - name: Create pull request
-      #   uses: chipinside/create-pull-request@master
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     base: master
-      #     head: version-bump-${{ env.version }}
-      #     title: ${{ env.title }}
-      #     body: ${{ env.title }}
-      #     labels: bump-version
-      #     assignees: ${{ github.actor }}
-      #     reviewers: Josewd
-
-      # - name: Wait for PR to be merged
-      #   id: wait_for_merge
-      #   uses: actions/github-script@v4
-      #   with:
-      #     script: |
-      #       const prs = await github.pulls.list({
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         state: 'open',
-      #         head: `version-bump-${{ env.version }}`,
-      #       });
-      #       if (prs.data.length === 0) {
-      #         throw new Error(`Pull request for branch version-bump-${{ env.version }} not found`);
-      #       }
-      #       const prNumber = prs.data[0].number;
-      #       let isMerged = false;
-      #       while (!isMerged) {
-      #         const { data: pr } = await github.pulls.get({
-      #           owner: context.repo.owner,
-      #           repo: context.repo.repo,
-      #           pull_number: prNumber,
-      #         });
-      #         if (pr.state === 'closed') {
-      #           throw new Error(`Pull request #${prNumber} is closed`);
-      #         }
-      #         if (pr.merged) {
-      #           isMerged = true;
-      #         } else {
-      #           console.log(`PR #${prNumber} not merged yet. Waiting...`);
-      #           await new Promise(resolve => setTimeout(resolve, 30000)); // Espera 30 secs antes de verificar novamente
-      #         }
-      #       }
-      #       return { prNumber };
-
       - name: Create Tag
         run: |
           VERSION=${{ env.version }}
@@ -118,11 +63,19 @@ jobs:
 
       - name: Generate Release Notes
         id: notes
-        uses: RedCrafter07/release-notes-action@v1.0.0
-        with:
-          tag-name: v${{ env.version }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: master
+        run: |
+          {
+            echo 'RELEASE_NOTES<<EOF'
+            curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer <YOUR-TOKEN>" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/josewd/anne_lima_app/releases/generate-notes \
+            -d '{"tag_name":"v"+${{env.version}}, "configuration_file_path":".github/release.yml"}' \
+            | jq -r '.body'
+            echo EOF
+          } >> "$GITHUB_ENV"
 
       - name: Fetch BetaJS Release Notes
         if: ${{ github.event.inputs.betajs_tag }}
@@ -140,7 +93,7 @@ jobs:
       - name: Build Release Body
         id: build_release_body
         run: |
-          NOTES="${{ steps.notes.outputs.release-notes }}"
+          NOTES="${{ env.RELEASE_NOTES }}"
           if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
             {
              echo 'release_body<<EOF'
@@ -152,19 +105,19 @@ jobs:
             echo "release_body=$NOTES" >> $GITHUB_ENV
           fi
 
-      - name: Create GitHub Release
-        id: create_release_note
-        run: |
-          gh release create v${{ env.version }} --notes-file ${{ env.release_body }}  -F /github/release.yml
-          
       # - name: Create GitHub Release
-      #   uses: actions/create-release@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-      #   with:
-      #     tag_name: v${{ env.version }}
-      #     release_name: v${{ env.version }}
-      #     body: ${{ env.release_body }}
-      #     draft: false
-      #     prerelease: false
+      #   id: create_release_note
+      #   run: |
+      #     gh release create v${{ env.version }} --notes-file ${{ env.release_body }}  -F /github/release.yml
+          
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        with:
+          tag_name: v${{ env.version }}
+          release_name: v${{ env.version }}
+          body: ${{ env.release_body }}
+          draft: false
+          prerelease: false
 
