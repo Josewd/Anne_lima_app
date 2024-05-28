@@ -153,13 +153,18 @@ jobs:
           fi
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-        with:
-          tag_name: v${{ env.version }}
-          release_name: v${{ env.version }}
-          body: ${{ env.release_body }}
-          draft: false
-          prerelease: false
+        id: create_release_note
+        run: |
+          gh release create v${{ env.version }} --notes-file ${{ env.release_body }}  -F /github/release.yml
+          
+      # - name: Create GitHub Release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      #   with:
+      #     tag_name: v${{ env.version }}
+      #     release_name: v${{ env.version }}
+      #     body: ${{ env.release_body }}
+      #     draft: false
+      #     prerelease: false
 
