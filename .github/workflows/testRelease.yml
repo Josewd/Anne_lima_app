@@ -94,7 +94,7 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/betajs/betajs-media-components/releases/generate-notes \
-            -d "$(jq -n --arg tag_name "v0.0.480" --arg previous_tag_name "v$BETAJSTAG"  '{tag_name: $tag_name, previous_tag_name: $previous_tag_name}')" \
+            -d "$(jq -n --arg tag_name "v0.0.479" --arg previous_tag_name "v$BETAJSTAG"  '{tag_name: $tag_name, previous_tag_name: $previous_tag_name}')" \
             | jq -r '.body'
             echo EOF
           } >> "$GITHUB_ENV"
