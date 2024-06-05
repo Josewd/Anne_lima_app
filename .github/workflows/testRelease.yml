@@ -91,7 +91,7 @@ jobs:
             curl -L \
             -X POST \
             -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer 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" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/Josewd/betajs-media-components/releases/generate-notes \
             -d "$(jq -n --arg tag_name "v1.1.0" --arg previous_tag_name "1.0.0"  '{tag_name: $tag_name, previous_tag_name: $previous_tag_name}')" \
