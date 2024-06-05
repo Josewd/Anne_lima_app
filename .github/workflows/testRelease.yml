@@ -84,6 +84,8 @@ jobs:
       - name: Fetch BetaJS Release Notes
         if: ${{ github.event.inputs.betajs_tag }}
         id: fetch_betajs_notes
+        env: 
+          BETA_PERMISSION: ${{ secrets.BETA_PERMISSION}}
         run: |
           BETAJSTAG=${{ github.event.inputs.betajs_tag }}
           {
@@ -91,7 +93,7 @@ jobs:
             curl -L \
             -X POST \
             -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Authorization: Bearer ${{ env.BETA_PERMISSION }}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/Josewd/betajs-media-components/releases/generate-notes \
             -d "$(jq -n --arg tag_name "v1.1.0" --arg previous_tag_name "1.0.0"  '{tag_name: $tag_name, previous_tag_name: $previous_tag_name}')" \
