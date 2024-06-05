@@ -47,7 +47,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           npm version $VERSION --no-git-tag-version
-          echo CURRENT_BETAJS_VERSION=$(npm list betajs-media-components --json | jq -r '.dependencies["betajs-media-components"].version') >> $GITHUB_ENV
+          echo CURRENT_BETAJS_VERSION=$(npm show betajs-media-components version) >> $GITHUB_ENV
           if [ -n "$BETAJSTAG" ]; then
             npm install betajs-media-components@$BETAJSTAG
           fi
