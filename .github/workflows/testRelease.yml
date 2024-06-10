@@ -106,16 +106,12 @@ jobs:
         id: build_release_body
         run: |
           NOTES="${{ env.RELEASE_NOTES }}"
-          if [ -n "${{ github.event.inputs.betajs_tag }}" ]; then
-            {
-             echo 'release_body<<EOF'
-             echo "$NOTES"
-             echo -e "\n\n## BetaJS Changes\n${{ env.NOTES }}"
-             echo EOF
-            } >> "$GITHUB_ENV"
-          else
-            echo "release_body=$NOTES" >> $GITHUB_ENV
-          fi
+          {
+           echo 'release_body<<EOF'
+           echo "$NOTES"
+           echo -e "\n\n## BetaJS Changes\n${{ env.NOTES }}"
+           echo EOF
+          } >> "$GITHUB_ENV"
 
       - name: Create GitHub Release
         id: create_release_note
