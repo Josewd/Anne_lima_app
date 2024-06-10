@@ -41,16 +41,17 @@ jobs:
           fi
           echo "version=$VERSION" >> $GITHUB_ENV
           
+          
       - name: Update package.json
         run: |
           VERSION=${{ env.version }}
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           npm version $VERSION --no-git-tag-version
-           VERSION=$(jq -r '.devDependencies["<nome-da-biblioteca>"]' package.json)
+          echo LATEST_BETAJS_VERSION=$(npm show betajs-media-components version) >> $GITHUB_ENV
           echo CURRENT_BETAJS_VERSION=$(jq -r '.dependencies["betajs-media-components"]' package.json) >> $GITHUB_ENV
-          if [ -n "$BETAJSTAG" ]; then
-            npm install betajs-media-components@$BETAJSTAG
+          if [ -n "$LATEST_BETAJS_TAG" ]; then
+            npm install betajs-media-components@${{ env.LATEST_BETAJS_TAG }}
           fi
           npm install
           git commit -am "Bump version to $VERSION"
@@ -84,12 +85,10 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Fetch BetaJS Release Notes
-        if: ${{ github.event.inputs.betajs_tag }}
         id: fetch_betajs_notes
         env: 
           BETA_PERMISSION: ${{ secrets.BETA_PERMISSION}}
         run: |
-          BETAJSTAG=${{ github.event.inputs.betajs_tag }}
           {
             echo 'NOTES<<EOF'
             curl -L \
@@ -98,7 +97,7 @@ jobs:
             -H "Authorization: Bearer ${{ env.BETA_PERMISSION }}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/betajs/betajs-media-components/releases/generate-notes \
-            -d "$(jq -n --arg tag_name "v$BETAJSTAG" --arg previous_tag_name "v${{ env.CURRENT_BETAJS_VERSION}}"  '{tag_name: $tag_name, previous_tag_name: $previous_tag_name}')" \
+            -d "$(jq -n --arg tag_name "v${{env.LATEST_BETAJS_VERSION}}" --arg previous_tag_name "v${{ env.CURRENT_BETAJS_VERSION}}"  '{tag_name: $tag_name, previous_tag_name: $previous_tag_name}')" \
             | jq -r '.body'
             echo EOF
           } >> "$GITHUB_ENV"
