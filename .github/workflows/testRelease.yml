@@ -54,6 +54,7 @@ jobs:
          | jq -r '.body')
          
           CURRENT_BETAJS_VERSION=$(echo "$body" | awk -F 'v' '{print $NF}')
+          echo $CURRENT_BETAJS_VERSION 
           echo "CURRENT_BETAJS_VERSION=$CURRENT_BETAJS_VERSION" >> $GITHUB_ENV  
           
       - name: Update package.json
