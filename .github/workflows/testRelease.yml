@@ -41,6 +41,20 @@ jobs:
           fi
           echo "version=$VERSION" >> $GITHUB_ENV
           
+      - name: Get BetaJs version from latest Video Player Release
+        env: 
+           OWNER: ${{ github.repository_owner }}
+           REPO: ${{ github.event.repository.name }}
+        run: |
+          body=$(curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/$OWNER/$REPO/releases/latest \
+            | jq -r '.body')
+          CURRENT_BETAJS_VERSION=$(echo "$body" | awk -F 'v' '{print $NF}')
+          $CURRENT_BETAJS_VERSION >> "GITHUB_ENV"    
           
       - name: Update package.json
         run: |
@@ -49,10 +63,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           npm version $VERSION --no-git-tag-version
           echo LATEST_BETAJS_VERSION=$(npm show betajs-media-components version) >> $GITHUB_ENV
-          echo CURRENT_BETAJS_VERSION=$(jq -r '.dependencies["betajs-media-components"]' package.json) >> $GITHUB_ENV
-          if [ -n "$LATEST_BETAJS_TAG" ]; then
-            npm install betajs-media-components@${{ env.LATEST_BETAJS_TAG }}
-          fi
+          npm install betajs-media-components@${{ env.LATEST_BETAJS_TAG }}
           npm install
           git commit -am "Bump version to $VERSION"
           git push origin HEAD
